@@ -1,0 +1,130 @@
+# goals.yaml — prioritization truth.
+#
+# This file outranks urgency, seniority, and inbox age. Every task, meeting, and inbound
+# message is scored against it. If something advances no goal here, it is "unaligned" and
+# never displaces P0 or P1 work.
+#
+# Edit this yourself. Your Chief of Staff may propose diffs but should not rewrite it.
+#
+# Schema
+#   id            short kebab-case handle, referenced by my-tasks.yaml
+#   title         one line, outcome-shaped ("ship X", not "work on X")
+#   priority      P0 | P1 | P2 | P3   (see CLAUDE.md §6)
+#   horizon       quarter | year | ongoing
+#   status        active | paused | done | dropped
+#   why           the consequence of not doing it — this is what makes triage possible
+#   metric        how you know it is done; a number and a date where possible
+#   target_date   YYYY-MM-DD or null
+#   stakeholders  names as they appear in contacts/
+#   keywords      terms used to match inbound items to this goal
+#   review        when you next re-evaluate whether this still deserves its priority
+
+version: 1
+owner: "{{NAME}}"
+updated: "2026-01-05"
+review_cadence: weekly
+
+goals:
+  - id: series-a
+    title: "Close the Series A at terms we can live with"
+    priority: P0
+    horizon: quarter
+    status: active
+    why: >
+      Eleven months of runway. Below six months the leverage in the negotiation
+      inverts and we take whatever is offered.
+    metric: "Signed term sheet by 2026-03-15"
+    target_date: "2026-03-15"
+    stakeholders: ["Jordan Rivera", "Priya Nair"]
+    keywords: ["term sheet", "diligence", "data room", "investor", "valuation", "cap table"]
+    review: "2026-01-12"
+
+  - id: retention
+    title: "Pull logo retention above 90% for the enterprise cohort"
+    priority: P0
+    horizon: quarter
+    status: active
+    why: >
+      Retention is the single number the Series A diligence will actually test.
+      Two churns in this cohort makes the round harder than any deck can fix.
+    metric: "Trailing-12-month logo retention >= 90% measured 2026-03-31"
+    target_date: "2026-03-31"
+    stakeholders: ["Priya Nair"]
+    keywords: ["churn", "renewal", "QBR", "escalation", "support", "enterprise"]
+    review: "2026-01-12"
+
+  - id: hire-eng-lead
+    title: "Hire an engineering lead who can own delivery end to end"
+    priority: P1
+    horizon: quarter
+    status: active
+    why: >
+      I am the bottleneck on every technical decision. Until this seat is filled
+      I cannot spend a full week on the raise.
+    metric: "Offer accepted by 2026-02-28"
+    target_date: "2026-02-28"
+    stakeholders: ["Sam Okafor"]
+    keywords: ["candidate", "interview", "offer", "recruiter", "onsite", "reference"]
+    review: "2026-01-19"
+
+  - id: pricing-v2
+    title: "Ship usage-based pricing to all new accounts"
+    priority: P1
+    horizon: quarter
+    status: active
+    why: >
+      Seat pricing caps expansion revenue. Every month we delay is a month of
+      net-revenue-retention we do not get back.
+    metric: "100% of new accounts on v2 pricing by 2026-03-31"
+    target_date: "2026-03-31"
+    stakeholders: ["Priya Nair", "Sam Okafor"]
+    keywords: ["pricing", "packaging", "billing", "usage", "contract", "discount"]
+    review: "2026-01-26"
+
+  - id: operating-rhythm
+    title: "Run a weekly operating rhythm that survives me being unavailable"
+    priority: P2
+    horizon: year
+    status: active
+    why: >
+      Fundraising will take me out of day-to-day for weeks at a time. The company
+      should not stall when that happens.
+    metric: "Four consecutive weeks of leadership review held without me"
+    target_date: null
+    stakeholders: ["Sam Okafor", "Priya Nair"]
+    keywords: ["weekly review", "operating", "process", "handoff", "on-call"]
+    review: "2026-02-02"
+
+  - id: health
+    title: "Protect sleep and training through the raise"
+    priority: P2
+    horizon: ongoing
+    status: active
+    why: >
+      Every previous raise cost me three months of health and the decisions I made
+      while depleted were the expensive ones.
+    metric: "Four training sessions a week; no calls before 09:00"
+    target_date: null
+    stakeholders: []
+    keywords: ["gym", "training", "doctor", "travel", "sleep"]
+    review: "2026-02-02"
+
+  - id: writing
+    title: "Publish monthly on what we are learning about enterprise onboarding"
+    priority: P3
+    horizon: year
+    status: paused
+    why: >
+      Compounds inbound over years, matters zero this quarter. Parked until the
+      round closes.
+    metric: "One essay per month"
+    target_date: null
+    stakeholders: []
+    keywords: ["essay", "blog", "newsletter", "podcast", "speaking"]
+    review: "2026-04-01"
+
+# Anything matching none of the keyword sets above is unaligned. Unaligned work is allowed
+# but tracked: if it exceeds a third of the week, the Chief of Staff says so in the briefing.
+unaligned_policy:
+  weekly_budget_pct: 33
+  action_when_exceeded: "flag in next /gm briefing with the three largest consumers"
