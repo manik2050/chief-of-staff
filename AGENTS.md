@@ -38,6 +38,13 @@ tests/             shell tests for the installer
    leftovers, and the test fails on them.
 6. **One path contract.** New paths go in `core/paths.py` as static methods and flow into
    `paths.json`. Never hardcode `~/.claude` anywhere else.
+7. **Canonicalize before you record a path.** `install.sh` resolves `HOME`, `CLAUDE_HOME`, and
+   the install root once, up front, and `core/paths.py` resolves the same way. Anything written
+   into a file — a substituted `{{COS_HOME}}`, the memory import line, `paths.json` — must come
+   from the resolved form. This is not cosmetic: on macOS `/tmp` is a symlink to `/private/tmp`
+   and `$TMPDIR` sits under `/var` -> `/private/var`, so an unresolved path and a resolved one
+   name the same directory while comparing unequal. Shell code uses the `canonicalize` helper
+   (`pwd -P` on the deepest existing ancestor), never `realpath(1)`, which older macOS lacks.
 
 ## Writing a command playbook
 
@@ -93,6 +100,8 @@ It asserts:
 - a pre-existing user file is never modified
 - no `{{PLACEHOLDER}}` survives into an installed file
 - `--dry-run` writes nothing at all
+- a symlinked install root resolves consistently across the OS file, the import line, and
+  `paths.json`, and stays idempotent when re-run through the symlink
 
 Add a case to it for anything you change in `install.sh`.
 

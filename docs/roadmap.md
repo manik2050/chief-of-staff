@@ -38,7 +38,8 @@ is reserved.
 - schema validation for `goals.yaml`, `my-tasks.yaml`, `schedules.yaml` and contact frontmatter
 - a lint that fails if any command playbook omits Description, Arguments, or Instructions
 - a secret scan over the whole tree
-- an installer test matrix: fresh install, re-install, install over a conflicting `~/.claude`
+- an installer test matrix across macOS and Linux: fresh install, re-install, install over a
+  conflicting `~/.claude`, and install through a symlinked root
 - a check that every `{{PLACEHOLDER}}` in the repo is one the installer actually substitutes
 
 `tests/install_test.sh` is the first of these. The rest follow once the file formats stop moving.
