@@ -1,0 +1,123 @@
+# my-tasks.yaml — open commitments.
+#
+# This is the Chief of Staff's working file. It writes here during /triage and /my-tasks.
+# Every task must reference a goal id from goals.yaml, or be explicitly marked unaligned.
+#
+# Schema
+#   id            t-NNN, never reused
+#   title         the outcome, phrased as a verb
+#   goal          goal id from goals.yaml, or "unaligned"
+#   status        next | in-progress | waiting | blocked | done | dropped
+#   tier          1 | 2 | 3  (triage tier at time of capture — see CLAUDE.md §8)
+#   next_action   the single physical next step; if you cannot name it, the task is not ready
+#   due           YYYY-MM-DD or null
+#   waiting_on    person's name (required when status is waiting)
+#   source        where it came from: email, meeting, slack, self, briefing
+#   created       YYYY-MM-DD
+#   touched       YYYY-MM-DD — updated whenever status or next_action changes
+#   notes         optional, one line
+#
+# Staleness rules the Chief of Staff enforces:
+#   - status: waiting  untouched 5+ days   -> propose a nudge
+#   - status: next     untouched 14+ days  -> propose dropping it
+#   - tier 2 item aged 14+ days            -> force it to tier 1 or drop it
+
+version: 1
+owner: "{{NAME}}"
+updated: "2026-01-05"
+next_id: 8
+
+tasks:
+  - id: t-001
+    title: "Send the updated data room link to Jordan Rivera"
+    goal: series-a
+    status: next
+    tier: 1
+    next_action: "Confirm the Q4 cohort tab is current, then draft the email for approval"
+    due: "2026-01-06"
+    waiting_on: null
+    source: email
+    created: "2026-01-05"
+    touched: "2026-01-05"
+    notes: "Jordan asked Friday; committed to Monday."
+
+  - id: t-002
+    title: "Get the Northwind renewal to a decision"
+    goal: retention
+    status: waiting
+    tier: 1
+    next_action: "Nudge Priya for the account's usage trend before the Thursday call"
+    due: "2026-01-09"
+    waiting_on: "Priya Nair"
+    source: meeting
+    created: "2026-01-02"
+    touched: "2026-01-05"
+    notes: "Largest logo in the enterprise cohort. Churn here is a diligence problem."
+
+  - id: t-003
+    title: "Decide between the two engineering lead finalists"
+    goal: hire-eng-lead
+    status: in-progress
+    tier: 2
+    next_action: "Read both reference write-ups end to end and write a one-page call"
+    due: "2026-01-12"
+    waiting_on: null
+    source: self
+    created: "2025-12-18"
+    touched: "2026-01-04"
+    notes: "Sam has a strong opinion; hear it after forming my own."
+
+  - id: t-004
+    title: "Approve the v2 pricing migration plan for existing accounts"
+    goal: pricing-v2
+    status: blocked
+    tier: 2
+    next_action: "Unblock: billing needs the grandfathering rule decided before they can spec"
+    due: null
+    waiting_on: null
+    source: slack
+    created: "2025-12-20"
+    touched: "2026-01-03"
+    notes: "Blocked on my decision, not on them. This is the bottleneck."
+
+  - id: t-005
+    title: "Write the quarterly board update"
+    goal: series-a
+    status: next
+    tier: 2
+    next_action: "Draft the retention section first; the rest follows from it"
+    due: "2026-01-15"
+    waiting_on: null
+    source: self
+    created: "2026-01-02"
+    touched: "2026-01-02"
+    notes: null
+
+  - id: t-006
+    title: "Move the standing 1:1 with Sam out of the Tuesday deep-work block"
+    goal: operating-rhythm
+    status: next
+    tier: 3
+    next_action: "Check Sam's Wednesday availability, then propose two slots"
+    due: null
+    waiting_on: null
+    source: briefing
+    created: "2026-01-05"
+    touched: "2026-01-05"
+    notes: null
+
+  - id: t-007
+    title: "Renew the conference speaking slot"
+    goal: unaligned
+    status: next
+    tier: 3
+    next_action: "Decline — nothing this quarter depends on it"
+    due: "2026-01-20"
+    waiting_on: null
+    source: email
+    created: "2026-01-04"
+    touched: "2026-01-04"
+    notes: "Kept visible so the decline is a decision, not a lapse."
+
+# Completed items stay here for one month, then move to an archive file.
+archive_after_days: 30
