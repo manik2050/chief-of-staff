@@ -12,6 +12,11 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORK_DIR="$(mktemp -d "${TMPDIR:-/tmp}/cos-test.XXXXXX")"
 trap 'rm -rf "$WORK_DIR"' EXIT
 
+# Resolve the scratch root before deriving anything from it. On macOS /tmp is a symlink to
+# /private/tmp and $TMPDIR lives under /var -> /private/var, so an unresolved WORK_DIR makes
+# every path assertion below compare two spellings of the same directory.
+WORK_DIR="$(cd "$WORK_DIR" && pwd -P)"
+
 PASSED=0
 FAILED=0
 
@@ -22,6 +27,24 @@ head_() { printf '\n%s\n' "$1"; }
 check()      { if [ "$2" = "$3" ]; then pass "$1"; else fail "$1 (expected '$3', got '$2')"; fi; }
 check_file() { if [ -f "$1" ]; then pass "exists: ${1#$WORK_DIR/}"; else fail "missing: ${1#$WORK_DIR/}"; fi; }
 check_dir()  { if [ -d "$1" ]; then pass "exists: ${1#$WORK_DIR/}/"; else fail "missing dir: ${1#$WORK_DIR/}/"; fi; }
+
+# Absolute path with symlinks resolved. Works on a path that does not exist yet, and does not
+# depend on realpath(1), which macOS did not ship until Monterey.
+realpath_of() {
+  local input="$1" suffix="" parent
+  while [ -n "$input" ] && [ "$input" != "/" ] && [ ! -d "$input" ]; do
+    suffix="/$(basename "$input")$suffix"
+    parent="$(dirname "$input")"
+    [ "$parent" = "$input" ] && break
+    input="$parent"
+  done
+  if [ -d "$input" ]; then printf '%s%s' "$(cd "$input" && pwd -P)" "$suffix"
+  else printf '%s' "$1"
+  fi
+}
+
+# The "root" value recorded in a generated paths.json.
+json_root() { sed -n 's/^[[:space:]]*"root":[[:space:]]*"\(.*\)",\{0,1\}$/\1/p' "$1" | head -1; }
 
 hash_file() {
   if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | awk '{print $1}'
@@ -87,11 +110,18 @@ check_file "$H1/.claude/CLAUDE.md"
 
 if command -v python3 >/dev/null 2>&1; then
   check_file "$COS/paths.json"
-  if grep -q "\"root\": \"$COS\"" "$COS/paths.json"; then
-    pass "paths.json points at the install root"
-  else
-    fail "paths.json does not point at the install root"
-  fi
+  # Compare resolved against resolved: paths.py canonicalizes, so anything under a symlinked
+  # /tmp or $TMPDIR would otherwise fail on a spelling difference rather than a real defect.
+  check "paths.json points at the install root" \
+    "$(realpath_of "$(json_root "$COS/paths.json")")" "$(realpath_of "$COS")"
+  # And the installer must agree with it verbatim, or the OS file and paths.json diverge.
+  check "installer and paths.json agree verbatim" "$(json_root "$COS/paths.json")" "$COS"
+  grep -qF "$(json_root "$COS/paths.json")" "$COS/CLAUDE.md" \
+    && pass "OS file carries the same root as paths.json" \
+    || fail "OS file and paths.json disagree on the install root"
+  grep -qF "$(json_root "$COS/paths.json")/CLAUDE.md" "$H1/.claude/CLAUDE.md" \
+    && pass "memory import line carries the same root as paths.json" \
+    || fail "memory import line and paths.json disagree on the install root"
 fi
 
 # ------------------------------------------------------------------ 3. placeholders resolved
@@ -179,8 +209,40 @@ check_file "$ALT/CLAUDE.md"
 check_file "$ALT/goals.yaml"
 grep -qF "$ALT" "$ALT/CLAUDE.md" && pass "install root substituted into the OS" || fail "install root not substituted"
 
-# --------------------------------------------------------------------------- 8. yaml parses
-head_ "8. shipped YAML parses"
+# --------------------------------------------------------------- 8. symlinked install root
+# This is the macOS /tmp -> /private/tmp case, reproduced explicitly so it is covered on every
+# platform. The installer resolves the root; every recorded path must agree on the resolved one.
+head_ "8. symlinked install root resolves consistently"
+H4="$WORK_DIR/home-symlink"
+REAL_ROOT="$WORK_DIR/real-root"
+LINK_ROOT="$WORK_DIR/link-root"
+mkdir -p "$H4" "$REAL_ROOT"
+ln -s "$REAL_ROOT" "$LINK_ROOT"
+run_install "$H4" --root "$LINK_ROOT" > "$WORK_DIR/install7.log" 2>&1 \
+  || fail "symlinked-root install exited non-zero"
+
+check_file "$REAL_ROOT/CLAUDE.md"
+grep -qF "$REAL_ROOT" "$REAL_ROOT/CLAUDE.md" \
+  && pass "OS file records the resolved root" || fail "OS file does not record the resolved root"
+grep -qF "@$REAL_ROOT/CLAUDE.md" "$H4/.claude/CLAUDE.md" \
+  && pass "import line records the resolved root" || fail "import line does not record the resolved root"
+if command -v python3 >/dev/null 2>&1; then
+  check "paths.json records the resolved root" "$(json_root "$REAL_ROOT/paths.json")" "$REAL_ROOT"
+fi
+if grep -rqF "$LINK_ROOT/" "$REAL_ROOT" 2>/dev/null; then
+  fail "an unresolved symlink path leaked into an installed file"
+else
+  pass "no unresolved symlink path in any installed file"
+fi
+BEFORE_LINK="$(fingerprint "$REAL_ROOT")"
+run_install "$H4" --root "$LINK_ROOT" > "$WORK_DIR/install8.log" 2>&1 \
+  || fail "second symlinked-root install exited non-zero"
+check "still idempotent through the symlink" "$(fingerprint "$REAL_ROOT")" "$BEFORE_LINK"
+grep -q "0 created" "$WORK_DIR/install8.log" \
+  && pass "second symlinked-root run reports 0 created" || fail "second symlinked-root run created files"
+
+# --------------------------------------------------------------------------- 9. yaml parses
+head_ "9. shipped YAML parses"
 if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' 2>/dev/null; then
   for f in goals.yaml my-tasks.yaml schedules.yaml; do
     if python3 -c "import sys,yaml; yaml.safe_load(open('$REPO_DIR/$f'))" 2>/dev/null; then
