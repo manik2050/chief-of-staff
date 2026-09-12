@@ -1,0 +1,14 @@
+{
+  "name": "Chief of Staff",
+  "install": "npm install",
+  "terminals": [
+    {
+      "name": "dev",
+      "command": "npm run dev"
+    }
+  ],
+  "ports": [
+    { "name": "client", "port": 5173 },
+    { "name": "api", "port": 4000 }
+  ]
+}

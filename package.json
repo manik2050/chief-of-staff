@@ -1,0 +1,24 @@
+{
+  "name": "chief-of-staff",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chief of Staff — an executive dashboard for tracking priorities, meetings, and team status.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm --workspace server run dev",
+    "dev:client": "npm --workspace client run dev",
+    "build": "npm --workspace server run build && npm --workspace client run build",
+    "typecheck": "npm --workspace server run typecheck && npm --workspace client run typecheck",
+    "start": "npm --workspace server run start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
