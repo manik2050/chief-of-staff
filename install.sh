@@ -116,6 +116,42 @@ detect_timezone() {
 
 git_config() { git config --get "$1" 2>/dev/null || true; }
 
+# canonicalize PATH — absolute path with symlinks resolved, portably and without realpath(1).
+#
+# macOS makes this mandatory rather than cosmetic: /tmp is a symlink to /private/tmp and
+# $TMPDIR lives under /var -> /private/var. core/paths.py resolves symlinks, so without this
+# the path substituted into CLAUDE.md and the memory import line would disagree with the root
+# recorded in paths.json for any install under those trees.
+#
+# Walks up to the deepest existing ancestor so it also works before the directory is created
+# (--dry-run), then re-attaches the remainder.
+canonicalize() {
+  local input="$1" suffix="" parent
+  case "$input" in "~") input="$HOME" ;; "~/"*) input="$HOME/${input#\~/}" ;; esac
+
+  while [ -n "$input" ] && [ "$input" != "/" ] && [ ! -d "$input" ]; do
+    suffix="/$(basename "$input")$suffix"
+    parent="$(dirname "$input")"
+    [ "$parent" = "$input" ] && break
+    input="$parent"
+  done
+
+  if [ -d "$input" ]; then
+    printf '%s%s' "$(cd "$input" && pwd -P)" "$suffix"
+  else
+    printf '%s' "$1"
+  fi
+}
+
+# short PATH — display form, with the canonical home collapsed to ~
+short() {
+  case "$1" in
+    "$HOME_CANON") printf '~' ;;
+    "$HOME_CANON"/*) printf '~%s' "${1#$HOME_CANON}" ;;
+    *) printf '%s' "$1" ;;
+  esac
+}
+
 # ask VARNAME "Prompt" "default"
 ask() {
   local var="$1" prompt="$2" default="$3" answer=""
@@ -160,13 +196,13 @@ copy_if_missing() {
   [ -f "$src" ] || die "missing source file: $src"
 
   if [ -e "$dest" ]; then
-    skip "${dest/#$HOME/\~}"
+    skip "$(short "$dest")"
     SKIPPED=$((SKIPPED + 1))
     return 0
   fi
 
   if [ "$DRY_RUN" -eq 1 ]; then
-    say "  would create ${dest/#$HOME/\~}"
+    say "  would create $(short "$dest")"
     CREATED=$((CREATED + 1))
     return 0
   fi
@@ -174,7 +210,7 @@ copy_if_missing() {
   make_dir "$(dirname "$dest")"
   cp "$src" "$dest"
   [ "$raw" = "--raw" ] || substitute_placeholders "$dest"
-  ok "${dest/#$HOME/\~}"
+  ok "$(short "$dest")"
   CREATED=$((CREATED + 1))
 }
 
@@ -187,12 +223,19 @@ case "$COS_HOME" in
   *) die "--root must be an absolute path (got: $COS_HOME)" ;;
 esac
 
+# Resolve every location once, here, so the path substituted into CLAUDE.md, the memory
+# import line, and the root recorded in paths.json are the same string by construction.
+HOME_CANON="$(canonicalize "$HOME")"
+CLAUDE_HOME="$(canonicalize "$CLAUDE_HOME")"
+COS_HOME="$(canonicalize "$COS_HOME")"
+COMMANDS_DIR="$CLAUDE_HOME/commands"
+
 # ------------------------------------------------------------------------------- config ----
 
 say ""
 say "${C_BOLD}Chief of Staff — install${C_OFF}"
-say "  install root : ${COS_HOME/#$HOME/\~}"
-say "  claude home  : ${CLAUDE_HOME/#$HOME/\~}"
+say "  install root : $(short "$COS_HOME")"
+say "  claude home  : $(short "$CLAUDE_HOME")"
 [ "$DRY_RUN" -eq 1 ] && say "  mode         : dry run (nothing will be written)"
 say ""
 
@@ -244,16 +287,16 @@ copy_if_missing "$SCRIPT_DIR/docs/mcp-servers.md"  "$COS_HOME/docs/mcp-servers.m
 # The path contract is generated, not authored, so regenerating it is not a destructive write.
 if command -v python3 >/dev/null 2>&1; then
   if [ "$DRY_RUN" -eq 1 ]; then
-    say "  would write  ${COS_HOME/#$HOME/\~}/paths.json"
+    say "  would write  $(short "$COS_HOME")/paths.json"
   else
     manifest_existed=0
     [ -f "$COS_HOME/paths.json" ] && manifest_existed=1
     CLAUDE_HOME="$CLAUDE_HOME" \
       python3 "$COS_HOME/core/paths.py" --root "$COS_HOME" --ensure --write >/dev/null
     if [ "$manifest_existed" -eq 1 ]; then
-      printf '%s  regen  %s  %s/paths.json\n' "$C_DIM" "$C_OFF" "${COS_HOME/#$HOME/\~}"
+      printf '%s  regen  %s  %s/paths.json\n' "$C_DIM" "$C_OFF" "$(short "$COS_HOME")"
     else
-      ok "${COS_HOME/#$HOME/\~}/paths.json ${C_DIM}(generated)${C_OFF}"
+      ok "$(short "$COS_HOME")/paths.json ${C_DIM}(generated)${C_OFF}"
     fi
   fi
 else
@@ -269,28 +312,28 @@ say ""
 say "Claude Code memory"
 if [ ! -e "$USER_MEMORY" ]; then
   if [ "$DRY_RUN" -eq 1 ]; then
-    say "  would create ${USER_MEMORY/#$HOME/\~} importing the OS"
+    say "  would create $(short "$USER_MEMORY") importing the OS"
   else
     {
       printf '# Personal Claude memory\n\n'
       printf 'Chief of Staff OS — the file below defines identity, constraints, and modes.\n\n'
       printf '%s\n' "$IMPORT_LINE"
     } > "$USER_MEMORY"
-    ok "${USER_MEMORY/#$HOME/\~}"
+    ok "$(short "$USER_MEMORY")"
     CREATED=$((CREATED + 1))
   fi
 elif grep -qF "$IMPORT_LINE" "$USER_MEMORY" 2>/dev/null; then
-  skip "${USER_MEMORY/#$HOME/\~} — already imports the OS"
+  skip "$(short "$USER_MEMORY") — already imports the OS"
   SKIPPED=$((SKIPPED + 1))
 elif [ "$MERGE_MEMORY" -eq 1 ]; then
   if [ "$DRY_RUN" -eq 1 ]; then
-    say "  would append the import line to ${USER_MEMORY/#$HOME/\~}"
+    say "  would append the import line to $(short "$USER_MEMORY")"
   else
     printf '\n%s\n' "$IMPORT_LINE" >> "$USER_MEMORY"
-    ok "${USER_MEMORY/#$HOME/\~} — import line appended"
+    ok "$(short "$USER_MEMORY") — import line appended"
   fi
 else
-  warn "${USER_MEMORY/#$HOME/\~} already exists and was left untouched."
+  warn "$(short "$USER_MEMORY") already exists and was left untouched."
   say ""
   say "  Add this line to it so Claude Code loads the OS:"
   say ""
@@ -310,7 +353,7 @@ if [ "$DRY_RUN" -eq 0 ]; then
     case "$candidate" in */_template.md) continue ;; esac
     [ -f "$candidate" ] || continue
     if grep -qE '\{\{[A-Z_]+\}\}' "$candidate"; then
-      warn "unsubstituted placeholders in ${candidate/#$HOME/\~}"
+      warn "unsubstituted placeholders in $(short "$candidate")"
     fi
   done
 fi
@@ -324,8 +367,8 @@ if [ "${#WARNINGS[@]}" -gt 0 ]; then
 fi
 say ""
 say "Next:"
-say "  1. Edit ${COS_HOME/#$HOME/\~}/goals.yaml — it is the prioritization truth, and the"
+say "  1. Edit $(short "$COS_HOME")/goals.yaml — it is the prioritization truth, and the"
 say "     shipped goals are someone else's."
-say "  2. Connect Gmail and Google Calendar: see ${COS_HOME/#$HOME/\~}/docs/mcp-servers.md"
+say "  2. Connect Gmail and Google Calendar: see $(short "$COS_HOME")/docs/mcp-servers.md"
 say "  3. Open Claude Code and run:  ${C_BOLD}/gm${C_OFF}"
 say ""

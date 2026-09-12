@@ -50,22 +50,33 @@ class Paths:
     RESERVED = ("vault", "mcp", "skills")
 
     @staticmethod
+    def canonical(path: str | os.PathLike[str]) -> Path:
+        """Absolute, `~`-expanded, symlinks resolved.
+
+        Resolving symlinks is what makes the contract comparable. On macOS `/tmp` is a symlink
+        to `/private/tmp` and `$TMPDIR` sits under `/var` -> `/private/var`, so two spellings of
+        the same directory are common. `install.sh` canonicalizes the same way before it
+        substitutes paths into the installed files, so every recorded path matches this one.
+        """
+        return Path(path).expanduser().resolve()
+
+    @staticmethod
     def claude_home() -> Path:
         """The Claude Code configuration directory (`~/.claude` unless overridden)."""
         override = os.environ.get("CLAUDE_HOME")
         if override:
-            return Path(override).expanduser().resolve()
-        return (Path.home() / Paths.DEFAULT_CLAUDE_DIRNAME).resolve()
+            return Paths.canonical(override)
+        return Paths.canonical(Path.home() / Paths.DEFAULT_CLAUDE_DIRNAME)
 
     @staticmethod
     def root(explicit: str | os.PathLike[str] | None = None) -> Path:
         """The Chief of Staff install root, holding all state for one operator."""
         if explicit:
-            return Path(explicit).expanduser().resolve()
+            return Paths.canonical(explicit)
         override = os.environ.get("COS_HOME")
         if override:
-            return Path(override).expanduser().resolve()
-        return (Paths.claude_home() / Paths.DEFAULT_COS_DIRNAME).resolve()
+            return Paths.canonical(override)
+        return Paths.canonical(Paths.claude_home() / Paths.DEFAULT_COS_DIRNAME)
 
     @staticmethod
     def commands_dir() -> Path:
