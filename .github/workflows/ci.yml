@@ -107,7 +107,11 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+      - name: Skip upstream release-manifest gate on vendor snapshots
+        if: github.repository != 'tt-a1i/archify'
+        run: echo '::notice::Skipping published-update-manifest; this repository is a vendor snapshot without Archify GitHub Releases.'
       - name: Public notifier manifest must reference an existing stable Release
+        if: github.repository == 'tt-a1i/archify'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
