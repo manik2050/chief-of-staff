@@ -1,0 +1,5 @@
+# Keep repository governance and automation changes under the owner's review.
+/.github/CODEOWNERS @manik2050
+/.github/workflows/** @manik2050
+/.github/actions/** @manik2050
+/SECURITY.md @manik2050
