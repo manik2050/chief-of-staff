@@ -1,5 +1,3 @@
-> **Chief of Staff snapshot.** This tree is a vendored copy of [tt-a1i/archify](https://github.com/tt-a1i/archify) at [`72c750b`](https://github.com/tt-a1i/archify/commit/72c750bb070d95171dbb2244e5b62b1b7da69c12) (`v2.17.0-dev.1`). See [ORIGIN.md](ORIGIN.md).
-
 <p align="center">
   <strong>English</strong> · <a href="./README_ZH.md">简体中文</a>
 </p>

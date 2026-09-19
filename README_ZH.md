@@ -1,5 +1,3 @@
-> **Chief of Staff 快照。** 本仓库是 [tt-a1i/archify](https://github.com/tt-a1i/archify) 在 [`72c750b`](https://github.com/tt-a1i/archify/commit/72c750bb070d95171dbb2244e5b62b1b7da69c12)（`v2.17.0-dev.1`）的本地副本。详见 [ORIGIN.md](ORIGIN.md)。
-
 <p align="center">
   <a href="./README.md">English</a> · <strong>简体中文</strong>
 </p>
