@@ -35,6 +35,8 @@ class HeuristicGenerator:
             closing.append(f"The company is at {clean_text(brief.stage)} stage.")
         if brief.fundraising_goal:
             goal = clean_text(brief.fundraising_goal).rstrip(".")
+            if goal and goal[0].isupper() and not goal.isupper():
+                goal = goal[0].lower() + goal[1:]
             closing.append(f"The fundraising goal is to {goal}.")
         if closing:
             paragraphs.append(" ".join(closing))

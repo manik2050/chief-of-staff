@@ -56,3 +56,4 @@ def test_heuristic_preserves_source_facts():
     text = HeuristicGenerator().generate(brief)
     assert "Tidebench" in text or "seafood" in text.lower()
     assert "Seed" in text or "seed" in text
+    assert "to add more regional docks" in text
