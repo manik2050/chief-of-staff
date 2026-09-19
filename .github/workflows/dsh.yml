@@ -30,8 +30,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  vendor-snapshot:
+    name: Skip DSH packaging on vendor snapshot
+    if: github.repository != 'tt-a1i/archify'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo '::notice::DSH packaging needs Archify git history (release.json sourceCommit); skipped on this vendor snapshot.'
+
   contract:
     name: DSH package contract
+    if: github.repository == 'tt-a1i/archify'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -45,6 +53,7 @@ jobs:
 
   distribution-acceptance:
     name: DSH distribution acceptance
+    if: github.repository == 'tt-a1i/archify'
     needs: contract
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -65,8 +74,10 @@ jobs:
     name: adapter release (${{ matrix.os }})
     needs: contract
     if: >-
+      github.repository == 'tt-a1i/archify' && (
       github.event_name == 'workflow_dispatch' && inputs.adapter_release
       || startsWith(github.ref, 'refs/tags/archify-dsh-v')
+      )
     strategy:
       fail-fast: false
       matrix:

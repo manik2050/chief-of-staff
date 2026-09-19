@@ -17,3 +17,4 @@ Local adaptations:
 
 - `.github/CODEOWNERS` points at `@manik2050`
 - CI skips the upstream `published-update-manifest` gate, which requires Archify GitHub Releases that this repository does not publish
+- DSH integration CI is skipped here: packing `@tt-a1i/archify-dsh` needs Archify git history (`release.json` `sourceCommit`) that is not imported with this snapshot
