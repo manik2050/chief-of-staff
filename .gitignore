@@ -1,0 +1,25 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+.env
+.env.local
+*.log
+
+# Private training material — never commit
+data/raw/
+data/processed/
+data/ocr/
+data/permissions/
+artifacts/
+models/
+
+# Generated environment snapshots (except the committed template)
+configs/training-environment.txt
+!configs/training-environment.example.txt

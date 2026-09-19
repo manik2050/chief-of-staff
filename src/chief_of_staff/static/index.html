@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chief of Staff — grounded pitch copy</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="frame">
+      <header class="top">
+        <div>
+          <p class="eyebrow">Specialist model · v0 baseline</p>
+          <h1>Chief of Staff</h1>
+          <p class="lede">
+            Turn a startup brief into grounded funding-pitch copy. No invented
+            metrics. No slide JSON. Fine-tune later — only after this baseline
+            fails something specific.
+          </p>
+        </div>
+        <aside class="status" id="status">
+          <p>Loading pipeline…</p>
+        </aside>
+      </header>
+
+      <main class="grid">
+        <form id="brief-form" class="panel">
+          <label>
+            Startup brief
+            <textarea id="brief" name="brief" required minlength="12" rows="6">We help independent clinics reduce missed appointments with automated reminders and patient follow-up.</textarea>
+          </label>
+          <div class="row">
+            <label>
+              Industry
+              <input id="industry" name="industry" value="Healthcare" />
+            </label>
+            <label>
+              Stage
+              <input id="stage" name="stage" value="Seed" />
+            </label>
+          </div>
+          <label>
+            Traction <span class="hint">only facts you can source</span>
+            <input id="traction" name="traction" placeholder="Leave blank if unverified" />
+          </label>
+          <label>
+            Fundraising goal
+            <input id="fundraising_goal" name="fundraising_goal" value="Expand the product and sales team." />
+          </label>
+          <label>
+            Evidence
+            <textarea id="evidence" name="evidence" rows="3" placeholder="Optional retrieval / source notes. Numbers here are the only numbers the model may use."></textarea>
+          </label>
+          <label class="consent">
+            <input type="checkbox" id="consent" />
+            This request may be used to improve the model after review. Personal
+            details are stripped. Off by default.
+          </label>
+          <div class="actions">
+            <button type="submit" id="submit">Write pitch copy</button>
+            <button type="button" id="sample" class="ghost">Load sample</button>
+          </div>
+        </form>
+
+        <section class="panel output">
+          <div class="output-head">
+            <h2>Plain-text copy</h2>
+            <p class="meta" id="meta">Generator idle</p>
+          </div>
+          <article id="copy" class="copy">
+            Fill a brief and write. The scorecard on the right checks invented
+            numbers before anyone else does.
+          </article>
+          <div class="scorecard" id="scorecard" hidden>
+            <h3>Live evaluation</h3>
+            <ul id="scores"></ul>
+            <button type="button" class="ghost" id="report">Report unsupported claim</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

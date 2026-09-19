@@ -1,0 +1,35 @@
+{
+  "split_version": "v1",
+  "dataset_hash": "02fe685440f4b91b1cc862758b8f0611b54facce920054a4b6f7ff9d2e39fdfc",
+  "train_company_ids": [
+    "brassnote",
+    "clinicflow",
+    "coppershift",
+    "duskroute",
+    "emberyard",
+    "frostline",
+    "harborlane",
+    "kilnmail",
+    "ledgernest",
+    "northfork",
+    "pactroom",
+    "quartzpath",
+    "rivetops",
+    "tidebench",
+    "willowbank"
+  ],
+  "validation_company_ids": [
+    "millow",
+    "oakstack"
+  ],
+  "test_company_ids": [
+    "paperlane",
+    "saltwell"
+  ],
+  "counts": {
+    "train_examples": 17,
+    "validation_examples": 2,
+    "test_examples": 2
+  },
+  "created_at": "2026-09-19T14:46:11Z"
+}

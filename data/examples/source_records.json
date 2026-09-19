@@ -1,0 +1,14 @@
+[
+  {
+    "source_id": "synthetic-original",
+    "source_url": "https://github.com/manik2050/chief-of-staff",
+    "owner": "Manik Gupta",
+    "rights_status": "synthetic_original",
+    "permission_scope": "training",
+    "commercial_use_permitted": true,
+    "redistribution_permitted": true,
+    "rights_reviewed_at": "2026-09-19",
+    "private_evidence_ref": "",
+    "notes": "Fictional companies written for this repo. Not scraped. Safe to train and to publish."
+  }
+]

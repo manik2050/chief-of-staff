@@ -1,0 +1,24 @@
+# Data-rights and download allowlist.
+# Public availability is not training permission. Only list URLs you have reviewed.
+
+project_user_agent = "chief-of-staff/0.1"
+
+raw_dir = "data/raw/approved-source"
+download_manifest = "data/raw/download-manifest.json"
+ocr_dir = "data/ocr"
+processed_dir = "data/processed"
+examples_path = "data/examples/reviewed_examples.jsonl"
+source_records_path = "data/examples/source_records.json"
+split_manifest_path = "data/splits/v1.json"
+
+native_text_min_chars = 40
+
+[split]
+version = "v1"
+train_ratio = 0.8
+validation_ratio = 0.1
+test_ratio = 0.1
+seed = 17
+
+# Explicit allowlist. Empty by default — add only permission-cleared PDFs.
+approved_urls = []
