@@ -67,10 +67,15 @@ h3 {
   font-weight: 560;
 }
 
+h1,
+.verdict {
+  word-spacing: 0.08em;
+}
+
 h1 {
   margin: 0;
   font-size: 42px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .masthead-meta {

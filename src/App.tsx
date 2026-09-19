@@ -343,7 +343,8 @@ function DecisionCard({ result }: { result: TriageResult }) {
           <h3>Human review</h3>
           <p className="value">{decision.needsHuman ? "Yes" : "No"}</p>
           <p className="metric">
-            noul {answers.needs_human.noul.toFixed(2)} · gate ≥ {THRESHOLDS.needsHumanNoul}
+            yes {formatPercent(answers.needs_human.noul)} · gate ≥{" "}
+            {formatPercent(THRESHOLDS.needsHumanNoul)}
           </p>
         </article>
       </div>
