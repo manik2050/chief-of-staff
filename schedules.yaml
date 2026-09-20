@@ -1,0 +1,109 @@
+# schedules.yaml — rhythms and protected time.
+#
+# Read before any scheduling decision. The Chief of Staff subtracts everything in this file
+# from the live calendar before proposing a single slot (see CLAUDE.md §10).
+#
+# Days use lowercase three-letter keys: mon tue wed thu fri sat sun
+# Times are 24h local to the timezone below.
+
+version: 1
+owner: "{{NAME}}"
+timezone: "{{TIMEZONE}}"
+updated: "2026-01-05"
+
+working_hours:
+  mon: ["09:00", "18:00"]
+  tue: ["09:00", "18:00"]
+  wed: ["09:00", "18:00"]
+  thu: ["09:00", "18:00"]
+  fri: ["09:00", "16:00"]
+  sat: []
+  sun: []
+
+# Nothing below P0 may be scheduled into these. The Chief of Staff treats them as busy
+# even when the calendar shows them as free.
+protected_blocks:
+  - name: "Deep work"
+    days: ["tue", "thu"]
+    start: "09:00"
+    end: "12:00"
+    hard: true
+    note: "The only reliable thinking time in the week. Moving it costs two days, not two hours."
+
+  - name: "Training"
+    days: ["mon", "wed", "fri"]
+    start: "07:00"
+    end: "08:15"
+    hard: true
+    note: "Serves the health goal. Not negotiable for anything that can happen at 15:00."
+
+  - name: "Family dinner"
+    days: ["mon", "tue", "wed", "thu", "fri"]
+    start: "18:30"
+    end: "20:00"
+    hard: true
+    note: null
+
+  - name: "Weekly review"
+    days: ["fri"]
+    start: "14:00"
+    end: "15:00"
+    hard: false
+    note: "Reconcile my-tasks.yaml against goals.yaml. Movable within Friday only."
+
+# Recurring commitments the Chief of Staff should expect to see on the calendar.
+# If one is missing from the live calendar, mention it once in the briefing.
+recurring:
+  - name: "Leadership sync"
+    days: ["mon"]
+    start: "10:00"
+    duration_min: 50
+    attendees: ["Sam Okafor", "Priya Nair"]
+    goal: operating-rhythm
+
+  - name: "1:1 — Sam Okafor"
+    days: ["tue"]
+    start: "11:00"
+    duration_min: 25
+    attendees: ["Sam Okafor"]
+    goal: hire-eng-lead
+    note: "Currently collides with the Tuesday deep-work block. See task t-006."
+
+  - name: "1:1 — Priya Nair"
+    days: ["wed"]
+    start: "15:00"
+    duration_min: 25
+    attendees: ["Priya Nair"]
+    goal: retention
+
+  - name: "Pipeline review"
+    days: ["thu"]
+    start: "16:00"
+    duration_min: 50
+    attendees: ["Priya Nair"]
+    goal: retention
+
+# Windows that are technically free but should never be offered to anyone.
+no_meeting_windows:
+  - days: ["mon", "tue", "wed", "thu", "fri"]
+    before: "09:30"
+    reason: "Mornings are for the briefing and the first real task of the day"
+  - days: ["fri"]
+    after: "15:00"
+    reason: "Friday afternoons are for closing the week, not opening threads"
+
+scheduling_defaults:
+  meeting_lengths_min: [25, 50]
+  buffer_min: 15                 # applied either side of anything with a location
+  travel_buffer_min: 45          # applied either side of anything requiring travel
+  max_meetings_per_day: 5
+  max_consecutive_meetings: 3
+  prefer: "cluster against existing meetings rather than fragment a clear afternoon"
+  external_meeting_days: ["wed", "thu"]
+
+# When the Chief of Staff should offer the morning briefing.
+briefing:
+  command: "/gm"
+  suggest_after: "08:30"
+  suggest_before: "11:00"
+  archive_to: "briefings/"
