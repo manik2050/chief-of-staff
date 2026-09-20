@@ -16,8 +16,11 @@ my-tasks.yaml      open commitments (worked example)
 schedules.yaml     rhythms and protected time (worked example)
 commands/*.md      slash-command playbooks, one per command
 contacts/          CRM: README (schema), _template.md, one worked example
+work-log/          assignments: README, _template.md; /dispatch writes the rest
+templates/         weekly-status.md (used by /my-tasks status)
 core/paths.py      the path contract; nothing else may build paths
-docs/              mcp-servers.md (setup), roadmap.md (what is deliberately absent)
+docs/              mcp-servers.md, cursor-projects.md, roadmap.md
+.cursor/           project rule, mcp.json.example, command links
 install.sh         the installer
 tests/             shell tests for the installer
 ```
@@ -95,13 +98,14 @@ shellcheck install.sh tests/*.sh # if you have it
 `tests/install_test.sh` runs everything inside a temporary `HOME` and touches nothing of yours.
 It asserts:
 
-- a fresh install creates the expected tree
+- a fresh install creates the expected tree (including `work-log/`, Cursor command dir, `/dispatch`)
 - a second run creates nothing and leaves every file byte-identical
 - a pre-existing user file is never modified
 - no `{{PLACEHOLDER}}` survives into an installed file
 - `--dry-run` writes nothing at all
 - a symlinked install root resolves consistently across the OS file, the import line, and
   `paths.json`, and stays idempotent when re-run through the symlink
+- `paths.json` lists `work_log` next to `briefings` / `drafts`
 
 Add a case to it for anything you change in `install.sh`.
 

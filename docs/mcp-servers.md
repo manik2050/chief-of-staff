@@ -27,50 +27,81 @@ if you decide you want to.
 
 | Server | Adds | Without it |
 | --- | --- | --- |
-| Slack | DM and channel triage; catches the Tier 1 items that never reach email | The chat section is omitted |
+| Slack | DM and channel triage; catches the Tier 1 items that never reach email | Print "Chat unavailable" in one line |
 | Notion / Google Docs | Meeting notes and project pages feed enrichment | `/enrich` uses only mail and calendar |
 | Web search / fetch | Contact enrichment: role changes, funding, news | `/enrich` reports "no external check" |
 | Task tracker (Linear, Jira, Asana) | Two-way sync with `my-tasks.yaml` | `my-tasks.yaml` stands alone, which is fine |
+| GitHub | Optional follow-on for `/dispatch` (draft an issue or PR) | Assignment stays a file; `/dispatch` prints "GitHub unavailable" |
 | Filesystem | Explicit access to the install root if your client sandboxes it | Usually built in |
 
 ## Installing
 
 Both Claude Code and Cursor read MCP server definitions from JSON. The shape is the same; only
-the file location differs.
+the file location differs. This kit pins two maintained packages so you are not left with
+placeholders:
+
+| Server | npm package | Why this one |
+| --- | --- | --- |
+| Gmail | [`@klodr/gmail-mcp`](https://www.npmjs.com/package/@klodr/gmail-mcp) | Scope-gated tools. `gmail.readonly,gmail.compose` exposes read + drafts and **hides send**. |
+| Google Calendar | [`@cocal/google-calendar-mcp`](https://www.npmjs.com/package/@cocal/google-calendar-mcp) | Active `nspady/google-calendar-mcp` publish. `list-events` / `get-freebusy` are the reads `/gm` needs. |
+
+A ready-to-copy config lives at [`.cursor/mcp.json.example`](../.cursor/mcp.json.example) in the
+repo (also installed to `docs/mcp.json.example` under the install root).
+
+**Auth, once, with the minimum scopes.** Tokens stay outside the repo.
+
+```bash
+mkdir -p ~/.config/cos
+
+# Gmail: read the inbox, create drafts, cannot send. That is the product guarantee
+# enforced below the model. Widen to gmail.send later only if you decide you want to.
+npx -y @klodr/gmail-mcp auth --scopes=gmail.readonly,gmail.compose
+
+# Calendar: desktop OAuth client JSON lives under ~/.config/cos/, never in this repo.
+# Point GOOGLE_OAUTH_CREDENTIALS at the absolute path of that JSON, then:
+npx -y @cocal/google-calendar-mcp auth
+```
+
+`@klodr/gmail-mcp` writes tokens to `~/.gmail-mcp/credentials.json` (mode 0600). The calendar
+server needs `GOOGLE_OAUTH_CREDENTIALS` set to an **absolute** path — tildes are not expanded.
 
 **Claude Code**
 
 ```bash
-# user scope — available in every project
-claude mcp add gmail --scope user -- <command to start the gmail server>
-claude mcp add gcal  --scope user -- <command to start the calendar server>
+claude mcp add gmail --scope user -- npx -y @klodr/gmail-mcp
+claude mcp add google-calendar --scope user -- npx -y @cocal/google-calendar-mcp
 
-claude mcp list          # confirm both are connected
+claude mcp list
 ```
 
-**Cursor** — add the same entries to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json`
-(per project):
+Pass the calendar credentials as an env var on that `mcp add` (or in `~/.claude.json`), matching
+the Cursor file below.
+
+**Cursor** — copy the example to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (this
+workspace), then replace the calendar credentials path with yours:
 
 ```json
 {
   "mcpServers": {
     "gmail": {
       "command": "npx",
-      "args": ["-y", "<gmail-mcp-package>"],
-      "env": { "GMAIL_CREDENTIALS_PATH": "~/.config/cos/gmail-credentials.json" }
+      "args": ["-y", "@klodr/gmail-mcp"]
     },
-    "gcal": {
+    "google-calendar": {
       "command": "npx",
-      "args": ["-y", "<calendar-mcp-package>"],
-      "env": { "GOOGLE_CREDENTIALS_PATH": "~/.config/cos/google-credentials.json" }
+      "args": ["-y", "@cocal/google-calendar-mcp"],
+      "env": {
+        "GOOGLE_OAUTH_CREDENTIALS": "/Users/you/.config/cos/gcp-oauth.keys.json"
+      }
     }
   }
 }
 ```
 
-Pick the specific Gmail and Calendar MCP packages you trust — they change often and this kit
-deliberately does not pin one for you. Whatever you choose, check that it supports the scopes in
-the table above and that it stores OAuth tokens outside your repository.
+Do not commit a filled `.cursor/mcp.json`. The example file is the one that belongs in git.
+
+If you swap either package, keep the scope rule: Gmail draft-only until you choose otherwise,
+and calendar read (plus free/busy) before any create-event scope.
 
 ## Credentials
 

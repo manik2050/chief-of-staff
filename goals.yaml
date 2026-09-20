@@ -6,6 +6,10 @@
 #
 # Edit this yourself. Your Chief of Staff may propose diffs but should not rewrite it.
 #
+# The shipped set is a generic TPM / operator — a public personal build, protected deep
+# work, a weekly status rhythm, a small relationship set, health. It is fiction. It is not
+# anyone's employer plan. Replace it.
+#
 # Schema
 #   id            short kebab-case handle, referenced by my-tasks.yaml
 #   title         one line, outcome-shaped ("ship X", not "work on X")
@@ -21,107 +25,93 @@
 
 version: 1
 owner: "{{NAME}}"
-updated: "2026-01-05"
+updated: "2026-09-20"
 review_cadence: weekly
 
 goals:
-  - id: series-a
-    title: "Close the Series A at terms we can live with"
+  - id: public-build
+    title: "Keep the personal public build shipping every week"
     priority: P0
-    horizon: quarter
+    horizon: ongoing
     status: active
     why: >
-      Eleven months of runway. Below six months the leverage in the negotiation
-      inverts and we take whatever is offered.
-    metric: "Signed term sheet by 2026-03-15"
-    target_date: "2026-03-15"
-    stakeholders: ["Jordan Rivera", "Priya Nair"]
-    keywords: ["term sheet", "diligence", "data room", "investor", "valuation", "cap table"]
-    review: "2026-01-12"
+      A public repo that does not move is a stalled narrative. Weekly visible progress —
+      a commit on main, a playbook, a test — is how the operating system stays real.
+    metric: "At least one meaningful commit on the flagship public repo each week"
+    target_date: null
+    stakeholders: ["Jordan Rivera"]
+    keywords: ["github", "commit", "readme", "install", "dispatch", "chief of staff", "public"]
+    review: "2026-09-27"
 
-  - id: retention
-    title: "Pull logo retention above 90% for the enterprise cohort"
+  - id: deep-work
+    title: "Protect deep work so the build actually happens"
     priority: P0
-    horizon: quarter
+    horizon: ongoing
     status: active
     why: >
-      Retention is the single number the Series A diligence will actually test.
-      Two churns in this cohort makes the round harder than any deck can fix.
-    metric: "Trailing-12-month logo retention >= 90% measured 2026-03-31"
-    target_date: "2026-03-31"
-    stakeholders: ["Priya Nair"]
-    keywords: ["churn", "renewal", "QBR", "escalation", "support", "enterprise"]
-    review: "2026-01-12"
+      Meetings expand to fill the calendar. Without hard blocks the public build is the
+      first thing that slips, and it slips silently.
+    metric: "Two 3-hour deep-work blocks kept each week; no P2+ work scheduled into them"
+    target_date: null
+    stakeholders: []
+    keywords: ["calendar", "focus", "deep work", "hold", "reschedule", "protected"]
+    review: "2026-09-27"
 
-  - id: hire-eng-lead
-    title: "Hire an engineering lead who can own delivery end to end"
+  - id: weekly-status
+    title: "Run a weekly status rhythm you could hand to anyone"
     priority: P1
-    horizon: quarter
-    status: active
-    why: >
-      I am the bottleneck on every technical decision. Until this seat is filled
-      I cannot spend a full week on the raise.
-    metric: "Offer accepted by 2026-02-28"
-    target_date: "2026-02-28"
-    stakeholders: ["Sam Okafor"]
-    keywords: ["candidate", "interview", "offer", "recruiter", "onsite", "reference"]
-    review: "2026-01-19"
-
-  - id: pricing-v2
-    title: "Ship usage-based pricing to all new accounts"
-    priority: P1
-    horizon: quarter
-    status: active
-    why: >
-      Seat pricing caps expansion revenue. Every month we delay is a month of
-      net-revenue-retention we do not get back.
-    metric: "100% of new accounts on v2 pricing by 2026-03-31"
-    target_date: "2026-03-31"
-    stakeholders: ["Priya Nair", "Sam Okafor"]
-    keywords: ["pricing", "packaging", "billing", "usage", "contract", "discount"]
-    review: "2026-01-26"
-
-  - id: operating-rhythm
-    title: "Run a weekly operating rhythm that survives me being unavailable"
-    priority: P2
     horizon: year
     status: active
     why: >
-      Fundraising will take me out of day-to-day for weeks at a time. The company
-      should not stall when that happens.
-    metric: "Four consecutive weeks of leadership review held without me"
+      If the week cannot be summarized, it was not directed. The status file is the
+      forcing function: goals, dispatches, blockers, one decision needed.
+    metric: "Four consecutive Fridays with a status file in briefings/"
     target_date: null
-    stakeholders: ["Sam Okafor", "Priya Nair"]
-    keywords: ["weekly review", "operating", "process", "handoff", "on-call"]
-    review: "2026-02-02"
+    stakeholders: ["Jordan Rivera"]
+    keywords: ["weekly status", "status", "review", "retro", "operating rhythm", "tldr"]
+    review: "2026-10-04"
 
-  - id: health
-    title: "Protect sleep and training through the raise"
+  - id: relationships
+    title: "Keep a small set of working relationships from going cold"
     priority: P2
     horizon: ongoing
     status: active
     why: >
-      Every previous raise cost me three months of health and the decisions I made
-      while depleted were the expensive ones.
+      The useful people are not in the inbox every day. Cadence is how you notice decay
+      before it becomes a reconnection email with no hook.
+    metric: "Zero inner-tier contacts overdue; at most three working-tier overdue at a time"
+    target_date: null
+    stakeholders: ["Jordan Rivera"]
+    keywords: ["intro", "catch up", "coffee", "nudge", "relationship", "network"]
+    review: "2026-10-11"
+
+  - id: health
+    title: "Protect sleep and training through the busy months"
+    priority: P2
+    horizon: ongoing
+    status: active
+    why: >
+      Depleted decisions are the expensive ones. Training and a hard stop in the evening
+      are cheaper than the week you lose repairing a tired call.
     metric: "Four training sessions a week; no calls before 09:00"
     target_date: null
     stakeholders: []
     keywords: ["gym", "training", "doctor", "travel", "sleep"]
-    review: "2026-02-02"
+    review: "2026-10-11"
 
   - id: writing
-    title: "Publish monthly on what we are learning about enterprise onboarding"
+    title: "Publish occasionally on how you operate"
     priority: P3
     horizon: year
     status: paused
     why: >
-      Compounds inbound over years, matters zero this quarter. Parked until the
-      round closes.
-    metric: "One essay per month"
+      Compounds inbound over years, matters zero this month. Parked until the weekly
+      shipping habit is boring.
+    metric: "One short essay per month once unpaused"
     target_date: null
     stakeholders: []
     keywords: ["essay", "blog", "newsletter", "podcast", "speaking"]
-    review: "2026-04-01"
+    review: "2026-12-01"
 
 # Anything matching none of the keyword sets above is unaligned. Unaligned work is allowed
 # but tracked: if it exceeds a third of the week, the Chief of Staff says so in the briefing.

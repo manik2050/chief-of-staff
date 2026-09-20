@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# install.sh — install the Chief of Staff OS into your Claude Code home.
+# install.sh — install the Chief of Staff OS into your Claude Code and Cursor homes.
 #
 # Two promises:
 #   Non-destructive — an existing file is never overwritten, appended to, or deleted.
@@ -20,6 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # ---------------------------------------------------------------------------- defaults ----
 
 CLAUDE_HOME="${CLAUDE_HOME:-$HOME/.claude}"
+CURSOR_HOME="${CURSOR_HOME:-$HOME/.cursor}"
 COS_HOME="${COS_HOME:-}"
 DRY_RUN=0
 ASSUME_YES=0
@@ -64,6 +65,7 @@ Options:
 
   --root DIR             Install root      (default: $COS_HOME, else ~/.claude/chief-of-staff)
   --claude-home DIR      Claude Code home  (default: $CLAUDE_HOME, else ~/.claude)
+  --cursor-home DIR      Cursor home       (default: $CURSOR_HOME, else ~/.cursor)
 
   --merge-memory         Append the OS import line to an existing ~/.claude/CLAUDE.md.
                          Off by default; without it the line is printed for you to add.
@@ -72,7 +74,8 @@ Options:
   --help, -h             This message
 
 Every value can also be supplied as an environment variable: COS_NAME, COS_ROLE,
-COS_COMPANY, COS_EMAIL, COS_TIMEZONE, COS_WORK_HOURS, COS_HOME, CLAUDE_HOME.
+COS_COMPANY, COS_EMAIL, COS_TIMEZONE, COS_WORK_HOURS, COS_HOME, CLAUDE_HOME,
+CURSOR_HOME.
 
 Re-running is safe. To refresh a file the installer already placed, delete your copy and run
 again — the installer will never overwrite one for you.
@@ -91,6 +94,7 @@ while [ $# -gt 0 ]; do
     --work-hours)  COS_WORK_HOURS="${2:?--work-hours needs a value}"; shift 2 ;;
     --root)        COS_HOME="${2:?--root needs a value}"; shift 2 ;;
     --claude-home) CLAUDE_HOME="${2:?--claude-home needs a value}"; shift 2 ;;
+    --cursor-home) CURSOR_HOME="${2:?--cursor-home needs a value}"; shift 2 ;;
     --merge-memory) MERGE_MEMORY=1; shift ;;
     --dry-run)     DRY_RUN=1; shift ;;
     -y|--yes)      ASSUME_YES=1; shift ;;
@@ -101,6 +105,7 @@ done
 
 COS_HOME="${COS_HOME:-$CLAUDE_HOME/chief-of-staff}"
 COMMANDS_DIR="$CLAUDE_HOME/commands"
+CURSOR_COMMANDS_DIR="$CURSOR_HOME/commands"
 
 # ------------------------------------------------------------------------------ helpers ----
 
@@ -225,10 +230,13 @@ esac
 
 # Resolve every location once, here, so the path substituted into CLAUDE.md, the memory
 # import line, and the root recorded in paths.json are the same string by construction.
+# Cursor home is canonicalized the same way so ~/.cursor/commands records agree.
 HOME_CANON="$(canonicalize "$HOME")"
 CLAUDE_HOME="$(canonicalize "$CLAUDE_HOME")"
+CURSOR_HOME="$(canonicalize "$CURSOR_HOME")"
 COS_HOME="$(canonicalize "$COS_HOME")"
 COMMANDS_DIR="$CLAUDE_HOME/commands"
+CURSOR_COMMANDS_DIR="$CURSOR_HOME/commands"
 
 # ------------------------------------------------------------------------------- config ----
 
@@ -236,6 +244,7 @@ say ""
 say "${C_BOLD}Chief of Staff — install${C_OFF}"
 say "  install root : $(short "$COS_HOME")"
 say "  claude home  : $(short "$CLAUDE_HOME")"
+say "  cursor home  : $(short "$CURSOR_HOME")"
 [ "$DRY_RUN" -eq 1 ] && say "  mode         : dry run (nothing will be written)"
 say ""
 
@@ -258,6 +267,7 @@ make_dir "$COS_HOME"
 make_dir "$COS_HOME/contacts"
 make_dir "$COS_HOME/briefings"
 make_dir "$COS_HOME/drafts"
+make_dir "$COS_HOME/work-log"
 
 copy_if_missing "$SCRIPT_DIR/CLAUDE.md"      "$COS_HOME/CLAUDE.md"
 copy_if_missing "$SCRIPT_DIR/goals.yaml"     "$COS_HOME/goals.yaml"
@@ -272,17 +282,35 @@ for contact in "$SCRIPT_DIR"/contacts/*.md; do
 done
 
 say ""
+say "Work log"
+for work_log_file in "$SCRIPT_DIR"/work-log/*.md; do
+  [ -e "$work_log_file" ] || continue
+  copy_if_missing "$work_log_file" "$COS_HOME/work-log/$(basename "$work_log_file")"
+done
+
+say ""
+say "Templates"
+for template_file in "$SCRIPT_DIR"/templates/*.md; do
+  [ -e "$template_file" ] || continue
+  copy_if_missing "$template_file" "$COS_HOME/templates/$(basename "$template_file")"
+done
+
+say ""
 say "Commands"
 make_dir "$COMMANDS_DIR"
+make_dir "$CURSOR_COMMANDS_DIR"
 for command_file in "$SCRIPT_DIR"/commands/*.md; do
   [ -e "$command_file" ] || continue
   copy_if_missing "$command_file" "$COMMANDS_DIR/$(basename "$command_file")"
+  copy_if_missing "$command_file" "$CURSOR_COMMANDS_DIR/$(basename "$command_file")"
 done
 
 say ""
 say "Support files"
-copy_if_missing "$SCRIPT_DIR/core/paths.py"        "$COS_HOME/core/paths.py" --raw
-copy_if_missing "$SCRIPT_DIR/docs/mcp-servers.md"  "$COS_HOME/docs/mcp-servers.md"
+copy_if_missing "$SCRIPT_DIR/core/paths.py"               "$COS_HOME/core/paths.py" --raw
+copy_if_missing "$SCRIPT_DIR/docs/mcp-servers.md"         "$COS_HOME/docs/mcp-servers.md"
+copy_if_missing "$SCRIPT_DIR/docs/cursor-projects.md"     "$COS_HOME/docs/cursor-projects.md"
+copy_if_missing "$SCRIPT_DIR/.cursor/mcp.json.example"    "$COS_HOME/docs/mcp.json.example" --raw
 
 # The path contract is generated, not authored, so regenerating it is not a destructive write.
 if command -v python3 >/dev/null 2>&1; then
@@ -348,6 +376,7 @@ if [ "$DRY_RUN" -eq 0 ]; then
   installed_files=("$COS_HOME"/*.yaml "$COS_HOME"/CLAUDE.md "$COS_HOME"/contacts/*.md)
   for command_file in "$SCRIPT_DIR"/commands/*.md; do
     installed_files+=("$COMMANDS_DIR/$(basename "$command_file")")
+    installed_files+=("$CURSOR_COMMANDS_DIR/$(basename "$command_file")")
   done
   for candidate in "${installed_files[@]}"; do
     case "$candidate" in */_template.md) continue ;; esac
@@ -370,5 +399,6 @@ say "Next:"
 say "  1. Edit $(short "$COS_HOME")/goals.yaml — it is the prioritization truth, and the"
 say "     shipped goals are someone else's."
 say "  2. Connect Gmail and Google Calendar: see $(short "$COS_HOME")/docs/mcp-servers.md"
-say "  3. Open Claude Code and run:  ${C_BOLD}/gm${C_OFF}"
+say "     Cursor: copy $(short "$COS_HOME")/docs/mcp.json.example to ~/.cursor/mcp.json"
+say "  3. Open this repo in Cursor (or Claude Code) and run:  ${C_BOLD}/gm${C_OFF}"
 say ""

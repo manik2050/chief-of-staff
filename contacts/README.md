@@ -10,10 +10,10 @@ export format, no sync. A person is a file you can read, and that is the whole p
 name: Jordan Rivera          # as you would address them
 tier: inner                  # inner | working | network | cold
 email: jordan@example.com
-company: Meridian Partners
+company: Independent
 role: Partner
 timezone: America/New_York
-goals: [series-a]            # goal ids from goals.yaml they are a stakeholder on
+goals: [public-build]        # goal ids from goals.yaml they are a stakeholder on
 first_met: 2024-09-12
 last_touch: 2026-01-02       # most recent one-to-one; mirrors the top Log entry
 ---
