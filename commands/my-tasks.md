@@ -1,6 +1,6 @@
 ---
 description: Reconcile open commitments against goals and the calendar, then re-rank.
-argument-hint: "[optional: 'today' | 'week' | a goal id | 'stale' | 'add <task text>']"
+argument-hint: "[optional: 'today' | 'week' | 'status' | a goal id | 'stale' | 'add <task text>']"
 ---
 
 # /my-tasks — Planning and Reconciliation
@@ -11,7 +11,8 @@ Bring `my-tasks.yaml` back into alignment with `goals.yaml` and reality. This co
 surfaces staleness, forces decisions on items that have been quietly rotting, and tells {{NAME}}
 what the week can actually hold.
 
-It writes to `my-tasks.yaml`. It never sends anything and never books time without approval.
+It writes to `my-tasks.yaml`. `/my-tasks status` also writes a dated status file under
+`briefings/`. It never sends anything and never books time without approval.
 
 ## Arguments
 
@@ -22,14 +23,16 @@ It writes to `my-tasks.yaml`. It never sends anything and never books time witho
 | _(empty)_ | Full reconciliation |
 | `today` | Only what is due today, overdue, or already scheduled today |
 | `week` | The next seven days, plus a capacity check |
-| a goal id (`series-a`) | Only tasks for that goal, plus whether the goal is on track |
+| `status` | Produce this week's status from goals, tasks, and open dispatches, shaped like `templates/weekly-status.md`. Write `briefings/YYYY-MM-DD-status.md`. Never send. |
+| a goal id (`public-build`) | Only tasks for that goal, plus whether the goal is on track |
 | `stale` | Only the staleness report from step 5 |
 | `add <text>` | Capture a single task, ask at most one clarifying question, then stop |
 
 ## Instructions
 
-1. **Load** `my-tasks.yaml`, `goals.yaml`, and `schedules.yaml`. If `my-tasks.yaml` is malformed,
-   quote the offending line and stop — do not rewrite a file you cannot parse.
+1. **Load** `my-tasks.yaml`, `goals.yaml`, `schedules.yaml`, and the file list of `work-log/`.
+   If `my-tasks.yaml` is malformed, quote the offending line and stop — do not rewrite a file
+   you cannot parse.
 
 2. **Validate every task.** Report and fix in place:
    - `goal` that does not exist in `goals.yaml` → ask which goal, or mark `unaligned`
@@ -80,8 +83,8 @@ It writes to `my-tasks.yaml`. It never sends anything and never books time witho
    - <title> — untouched <N>d, serves <goal>
 
    ### Goal coverage
-   - series-a (P0): 3 open
-   - retention (P0): 0 open  ← no one is working on this
+   - public-build (P0): 3 open
+   - weekly-status (P1): 0 open  ← no one is working on this
 
    Changes written: <list of task ids and what changed>
    ```
@@ -91,8 +94,14 @@ It writes to `my-tasks.yaml`. It never sends anything and never books time witho
    comment in the file. Never drop a task without explicit approval — `status: dropped` with a
    reason in `notes`, never deletion.
 
-9. **Offer one next step**, not five: either scheduling the top item into a free block, or making
-   the first decision in the decisions list.
+9. **Offer one next step**, not five: either scheduling the top item into a free block, making
+   the first decision in the decisions list, or (Friday, or when `$ARGUMENTS` is `status`)
+   writing the weekly status.
+
+   When producing status: fill `templates/weekly-status.md` from this reconciliation. Every
+   active goal gets a row. Open `work-log/` files get a row. Unaligned hours get a number.
+   Write `briefings/YYYY-MM-DD-status.md`. Show the file, then stop. Sending it is a later
+   turn with CLAUDE.md §4 — this command never sends.
 
 ## Guardrails
 

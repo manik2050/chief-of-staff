@@ -1,7 +1,8 @@
 # my-tasks.yaml — open commitments.
 #
-# This is the Chief of Staff's working file. It writes here during /triage and /my-tasks.
-# Every task must reference a goal id from goals.yaml, or be explicitly marked unaligned.
+# This is the Chief of Staff's working file. It writes here during /triage, /my-tasks,
+# and /dispatch. Every task must reference a goal id from goals.yaml, or be explicitly
+# marked unaligned.
 #
 # Schema
 #   id            t-NNN, never reused
@@ -12,7 +13,7 @@
 #   next_action   the single physical next step; if you cannot name it, the task is not ready
 #   due           YYYY-MM-DD or null
 #   waiting_on    person's name (required when status is waiting)
-#   source        where it came from: email, meeting, slack, self, briefing
+#   source        where it came from: email, meeting, slack, self, briefing, dispatch
 #   created       YYYY-MM-DD
 #   touched       YYYY-MM-DD — updated whenever status or next_action changes
 #   notes         optional, one line
@@ -24,99 +25,99 @@
 
 version: 1
 owner: "{{NAME}}"
-updated: "2026-01-05"
+updated: "2026-09-20"
 next_id: 8
 
 tasks:
   - id: t-001
-    title: "Send the updated data room link to Jordan Rivera"
-    goal: series-a
+    title: "Land this week's public commit on the flagship repo"
+    goal: public-build
     status: next
     tier: 1
-    next_action: "Confirm the Q4 cohort tab is current, then draft the email for approval"
-    due: "2026-01-06"
+    next_action: "Open the repo, pick one closed loop from work-log/, and ship it to main"
+    due: "2026-09-21"
     waiting_on: null
-    source: email
-    created: "2026-01-05"
-    touched: "2026-01-05"
-    notes: "Jordan asked Friday; committed to Monday."
+    source: self
+    created: "2026-09-20"
+    touched: "2026-09-20"
+    notes: "A docs-only week still counts if it is the missing Cursor path or a playbook."
 
   - id: t-002
-    title: "Get the Northwind renewal to a decision"
-    goal: retention
-    status: waiting
+    title: "Defend Tuesday morning deep work on the live calendar"
+    goal: deep-work
+    status: next
     tier: 1
-    next_action: "Nudge Priya for the account's usage trend before the Thursday call"
-    due: "2026-01-09"
-    waiting_on: "Priya Nair"
-    source: meeting
-    created: "2026-01-02"
-    touched: "2026-01-05"
-    notes: "Largest logo in the enterprise cohort. Churn here is a diligence problem."
+    next_action: "Read next Tuesday 09:00–12:00; if anything sits on it, draft a reschedule for approval"
+    due: "2026-09-22"
+    waiting_on: null
+    source: briefing
+    created: "2026-09-20"
+    touched: "2026-09-20"
+    notes: "Do not decline on {{NAME}}'s behalf. Draft, then wait."
 
   - id: t-003
-    title: "Decide between the two engineering lead finalists"
-    goal: hire-eng-lead
-    status: in-progress
+    title: "Write this week's status from tasks and open dispatches"
+    goal: weekly-status
+    status: next
     tier: 2
-    next_action: "Read both reference write-ups end to end and write a one-page call"
-    due: "2026-01-12"
+    next_action: "Run /my-tasks status and drop the file in briefings/"
+    due: "2026-09-25"
     waiting_on: null
     source: self
-    created: "2025-12-18"
-    touched: "2026-01-04"
-    notes: "Sam has a strong opinion; hear it after forming my own."
+    created: "2026-09-20"
+    touched: "2026-09-20"
+    notes: "Shape is templates/weekly-status.md. Never send the status from this task."
 
   - id: t-004
-    title: "Approve the v2 pricing migration plan for existing accounts"
-    goal: pricing-v2
-    status: blocked
+    title: "Close the loop on Jordan's review of the dispatch playbook"
+    goal: relationships
+    status: waiting
     tier: 2
-    next_action: "Unblock: billing needs the grandfathering rule decided before they can spec"
-    due: null
-    waiting_on: null
-    source: slack
-    created: "2025-12-20"
-    touched: "2026-01-03"
-    notes: "Blocked on my decision, not on them. This is the bottleneck."
+    next_action: "If silent past Wednesday, draft a three-line nudge for approval"
+    due: "2026-09-24"
+    waiting_on: "Jordan Rivera"
+    source: email
+    created: "2026-09-18"
+    touched: "2026-09-20"
+    notes: "They offered notes, not a meeting. Email only."
 
   - id: t-005
-    title: "Write the quarterly board update"
-    goal: series-a
-    status: next
+    title: "Decide whether Friday review stays a hard block"
+    goal: weekly-status
+    status: blocked
     tier: 2
-    next_action: "Draft the retention section first; the rest follows from it"
-    due: "2026-01-15"
+    next_action: "Unblock: pick hard:true or hard:false in schedules.yaml and stop revisiting it"
+    due: null
     waiting_on: null
     source: self
-    created: "2026-01-02"
-    touched: "2026-01-02"
-    notes: null
+    created: "2026-09-13"
+    touched: "2026-09-20"
+    notes: "Blocked on {{NAME}}'s decision, not on anyone else."
 
   - id: t-006
-    title: "Move the standing 1:1 with Sam out of the Tuesday deep-work block"
-    goal: operating-rhythm
+    title: "Move the Wednesday 1:1 off the morning no-meeting window"
+    goal: deep-work
     status: next
     tier: 3
-    next_action: "Check Sam's Wednesday availability, then propose two slots"
+    next_action: "Check Jordan's Thursday afternoon, then propose two slots"
     due: null
     waiting_on: null
     source: briefing
-    created: "2026-01-05"
-    touched: "2026-01-05"
-    notes: null
+    created: "2026-09-20"
+    touched: "2026-09-20"
+    notes: "Currently proposed at 09:15, which schedules.yaml forbids."
 
   - id: t-007
-    title: "Renew the conference speaking slot"
+    title: "Decline the conference speaking slot"
     goal: unaligned
     status: next
     tier: 3
-    next_action: "Decline — nothing this quarter depends on it"
-    due: "2026-01-20"
+    next_action: "Draft a decline — nothing this quarter depends on it"
+    due: "2026-09-30"
     waiting_on: null
     source: email
-    created: "2026-01-04"
-    touched: "2026-01-04"
+    created: "2026-09-19"
+    touched: "2026-09-19"
     notes: "Kept visible so the decline is a decision, not a lapse."
 
 # Completed items stay here for one month, then move to an archive file.

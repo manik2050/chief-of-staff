@@ -1,8 +1,9 @@
 # Roadmap — what is deliberately not here yet
 
 This kit is a bootable Chief of Staff, not a finished platform. What ships today is the part
-that earns its keep on day one: an OS file, four command playbooks, three state files, a
-markdown CRM, and an installer that will not clobber your home directory.
+that earns its keep on day one: an OS file, five command playbooks including `/dispatch`, three
+state files, a markdown CRM, a work-log, Cursor rules and pinned MCP examples, and an installer
+that will not clobber your home directory.
 
 The hardening below is planned. It is listed here so nobody has to guess whether an absence is
 an oversight or a decision.
@@ -11,8 +12,10 @@ an oversight or a decision.
 
 - `CLAUDE.md` as the OS: identity, voice, hard constraints, modes, MCP inventory
 - `goals.yaml` as prioritization truth, with `my-tasks.yaml` and `schedules.yaml` alongside it
-- `/gm`, `/triage`, `/my-tasks`, `/enrich`
+- `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`
 - `contacts/` as a dated, append-only markdown CRM
+- `work-log/` as file-native assignments to humans and agent roles
+- Cursor project rule, `.cursor/mcp.json.example`, `docs/cursor-projects.md`
 - `core/paths.py` — a single path contract, plus a generated `paths.json`
 - `install.sh` — idempotent, non-destructive, placeholder substitution at install time
 

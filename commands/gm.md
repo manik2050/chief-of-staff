@@ -1,6 +1,6 @@
 ---
 description: Morning briefing — one screen covering the last 24 hours and the next 24.
-argument-hint: "[optional: a date, or 'short', or a focus area like 'fundraise']"
+argument-hint: "[optional: a date, or 'short', or a focus area like 'public-build']"
 ---
 
 # /gm — Morning Briefing
@@ -28,9 +28,10 @@ If it does not fit on one screen, you have not prioritized.
 
 ## Instructions
 
-1. **Load state.** Read `paths.json`, then `goals.yaml`, `my-tasks.yaml`, `schedules.yaml`, and
-   the file list of `contacts/`. If any is missing or malformed, note it in one line at the end
-   of the briefing and continue with what loaded. Do not attempt repairs.
+1. **Load state.** Read `paths.json`, then `goals.yaml`, `my-tasks.yaml`, `schedules.yaml`, the
+   file list of `contacts/`, and the file list of `work-log/`. If any is missing or malformed,
+   note it in one line at the end of the briefing and continue with what loaded. Do not attempt
+   repairs.
 
 2. **Establish the window.** "Since" is the last briefing in `briefings/`, or 24 hours ago if
    there is none. "Until" is the end of today in {{TIMEZONE}}. State neither in the output; just
@@ -57,11 +58,17 @@ If it does not fit on one screen, you have not prioritized.
    recent dated entry inside each contact file. Surface at most three overdue contacts, highest
    tier first, and only with a concrete hook.
 
-8. **Detect collisions.** Any meeting overlapping a `hard: true` protected block, any day over
+8. **Check open dispatches.** List files in `work-log/` whose frontmatter `status` is `open` or
+   `in-progress`. Skip `_template.md` and `README.md`. If the directory is missing, print
+   "Work-log unavailable" under Loops and continue. For each open dispatch capture: title, owner
+   (`owner.name`), goal id, created date, and whether `status_location` has been updated in 3+
+   days (stale). At most five rows; if there are more, say the count you suppressed.
+
+9. **Detect collisions.** Any meeting overlapping a `hard: true` protected block, any day over
    `max_meetings_per_day`, any run over `max_consecutive_meetings`, and any recurring commitment
    in `schedules.yaml` that is missing from the live calendar.
 
-9. **Write the briefing** in exactly this shape. Keep every bullet to one line. Omit no section —
+10. **Write the briefing** in exactly this shape. Keep every bullet to one line. Omit no section —
    an empty section prints "Nothing."
 
    ```
@@ -70,7 +77,7 @@ If it does not fit on one screen, you have not prioritized.
    **Today in one line:** <the single thing that determines whether today worked>
 
    ### Agenda
-   - 10:00–10:50  Leadership sync — Sam, Priya  [operating-rhythm]
+   - 09:30–09:55  1:1 — Jordan Rivera  [relationships]
    - ...
    Free: <the largest uninterrupted blocks, in order of size>
 
@@ -87,6 +94,7 @@ If it does not fit on one screen, you have not prioritized.
    - Overdue: <task> (due <date>)
    - Waiting <N>d on <person>: <task> — Recommend: nudge
    - Self-blocked: <task> — Recommend: decide <the decision>
+   - Dispatch: <slug> — owner <name or role> — [goal] — <open | stale Nd>
 
    ### Relationships
    - <Name> (<tier>, <N>d) — hook: <specific reason to reach out>
@@ -101,13 +109,13 @@ If it does not fit on one screen, you have not prioritized.
    **What do you want to take first?**
    ```
 
-10. **Archive it.** Write the same text to `briefings/YYYY-MM-DD.md`. If that file already
+11. **Archive it.** Write the same text to `briefings/YYYY-MM-DD.md`. If that file already
     exists, append under a `## Re-run HH:MM` heading rather than overwriting it.
 
-11. **Stop.** Do not draft replies, do not propose calendar changes, and do not update
+12. **Stop.** Do not draft replies, do not propose calendar changes, and do not update
     `my-tasks.yaml` in this command. If {{NAME}} answers the closing question, switch to the
-    mode that fits — `/triage` for inbound, `/my-tasks` for planning — and say which mode you
-    moved to.
+    mode that fits — `/triage` for inbound, `/my-tasks` for planning, `/dispatch` for
+    assignment — and say which mode you moved to.
 
 ## Guardrails
 

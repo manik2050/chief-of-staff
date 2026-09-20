@@ -43,10 +43,10 @@ class Paths:
     DEFAULT_COS_DIRNAME = "chief-of-staff"
 
     # Directories install.sh and the agent may create. Everything else must already exist.
-    MANAGED_DIRS = ("contacts", "briefings", "drafts")
+    MANAGED_DIRS = ("contacts", "briefings", "drafts", "work-log")
 
-    # Reserved for later phases (PARA vault, Python MCP servers). Declared now so the contract
-    # is stable and nothing has to invent a location later. Not created by install.sh.
+    # Reserved for later phases (PARA vault, Python MCP servers, shared skills). Declared now
+    # so the contract is stable. Not created by install.sh.
     RESERVED = ("vault", "mcp", "skills")
 
     @staticmethod
@@ -113,6 +113,11 @@ class Paths:
         return (root or Paths.root()) / "drafts"
 
     @staticmethod
+    def work_log_dir(root: Path | None = None) -> Path:
+        """Assignment files written by /dispatch. One markdown file per piece of work."""
+        return (root or Paths.root()) / "work-log"
+
+    @staticmethod
     def manifest(root: Path | None = None) -> Path:
         """Where the generated contract is written."""
         return (root or Paths.root()) / "paths.json"
@@ -143,6 +148,7 @@ class Paths:
                 "contacts": str(Paths.contacts_dir(base)),
                 "briefings": str(Paths.briefings_dir(base)),
                 "drafts": str(Paths.drafts_dir(base)),
+                "work_log": str(Paths.work_log_dir(base)),
             },
             "reserved": Paths.reserved(base),
         }

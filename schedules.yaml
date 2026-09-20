@@ -9,7 +9,7 @@
 version: 1
 owner: "{{NAME}}"
 timezone: "{{TIMEZONE}}"
-updated: "2026-01-05"
+updated: "2026-09-20"
 
 working_hours:
   mon: ["09:00", "18:00"]
@@ -37,51 +37,37 @@ protected_blocks:
     hard: true
     note: "Serves the health goal. Not negotiable for anything that can happen at 15:00."
 
-  - name: "Family dinner"
+  - name: "Evening stop"
     days: ["mon", "tue", "wed", "thu", "fri"]
     start: "18:30"
     end: "20:00"
     hard: true
     note: null
 
-  - name: "Weekly review"
+  - name: "Weekly status"
     days: ["fri"]
     start: "14:00"
     end: "15:00"
     hard: false
-    note: "Reconcile my-tasks.yaml against goals.yaml. Movable within Friday only."
+    note: "Run /my-tasks status. Movable within Friday only."
 
 # Recurring commitments the Chief of Staff should expect to see on the calendar.
 # If one is missing from the live calendar, mention it once in the briefing.
 recurring:
-  - name: "Leadership sync"
-    days: ["mon"]
-    start: "10:00"
-    duration_min: 50
-    attendees: ["Sam Okafor", "Priya Nair"]
-    goal: operating-rhythm
-
-  - name: "1:1 — Sam Okafor"
-    days: ["tue"]
-    start: "11:00"
-    duration_min: 25
-    attendees: ["Sam Okafor"]
-    goal: hire-eng-lead
-    note: "Currently collides with the Tuesday deep-work block. See task t-006."
-
-  - name: "1:1 — Priya Nair"
+  - name: "1:1 — Jordan Rivera"
     days: ["wed"]
     start: "15:00"
     duration_min: 25
-    attendees: ["Priya Nair"]
-    goal: retention
+    attendees: ["Jordan Rivera"]
+    goal: relationships
+    note: "Working-session, not a catch-up. Always send a one-line purpose first."
 
-  - name: "Pipeline review"
+  - name: "Build review"
     days: ["thu"]
     start: "16:00"
     duration_min: 50
-    attendees: ["Priya Nair"]
-    goal: retention
+    attendees: ["Jordan Rivera"]
+    goal: public-build
 
 # Windows that are technically free but should never be offered to anyone.
 no_meeting_windows:

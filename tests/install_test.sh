@@ -102,10 +102,19 @@ check_file "$COS/contacts/_template.md"
 check_file "$COS/contacts/jordan-rivera.md"
 check_dir  "$COS/briefings"
 check_dir  "$COS/drafts"
+check_dir  "$COS/work-log"
+check_file "$COS/work-log/_template.md"
+check_file "$COS/work-log/README.md"
+check_file "$COS/templates/weekly-status.md"
+check_file "$COS/docs/cursor-projects.md"
+check_file "$COS/docs/mcp.json.example"
 check_file "$H1/.claude/commands/gm.md"
 check_file "$H1/.claude/commands/triage.md"
 check_file "$H1/.claude/commands/my-tasks.md"
 check_file "$H1/.claude/commands/enrich.md"
+check_file "$H1/.claude/commands/dispatch.md"
+check_file "$H1/.cursor/commands/gm.md"
+check_file "$H1/.cursor/commands/dispatch.md"
 check_file "$H1/.claude/CLAUDE.md"
 
 if command -v python3 >/dev/null 2>&1; then
@@ -122,14 +131,25 @@ if command -v python3 >/dev/null 2>&1; then
   grep -qF "$(json_root "$COS/paths.json")/CLAUDE.md" "$H1/.claude/CLAUDE.md" \
     && pass "memory import line carries the same root as paths.json" \
     || fail "memory import line and paths.json disagree on the install root"
+  if python3 - "$COS/paths.json" "$COS/work-log" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1]))
+got = data.get("dirs", {}).get("work_log")
+sys.exit(0 if got == sys.argv[2] else 1)
+PY
+  then
+    pass "paths.json lists work_log at the install dir"
+  else
+    fail "paths.json missing or wrong work_log dir"
+  fi
 fi
 
 # ------------------------------------------------------------------ 3. placeholders resolved
 head_ "3. placeholder substitution"
-if grep -rlE '\{\{[A-Z_]+\}\}' "$COS" "$H1/.claude/commands" 2>/dev/null \
+if grep -rlE '\{\{[A-Z_]+\}\}' "$COS" "$H1/.claude/commands" "$H1/.cursor/commands" 2>/dev/null \
      | grep -v '_template.md' | grep -q .; then
   fail "unsubstituted placeholders remain"
-  grep -rlE '\{\{[A-Z_]+\}\}' "$COS" "$H1/.claude/commands" 2>/dev/null | grep -v '_template.md'
+  grep -rlE '\{\{[A-Z_]+\}\}' "$COS" "$H1/.claude/commands" "$H1/.cursor/commands" 2>/dev/null | grep -v '_template.md'
 else
   pass "no unsubstituted placeholders in installed files"
 fi
@@ -137,7 +157,17 @@ grep -q "Ada Lovelace" "$COS/CLAUDE.md"        && pass "name substituted into CL
 grep -q "Europe/London" "$COS/CLAUDE.md"       && pass "timezone substituted into CLAUDE.md"    || fail "timezone missing from CLAUDE.md"
 grep -q "Europe/London" "$COS/schedules.yaml"  && pass "timezone substituted into schedules"    || fail "timezone missing from schedules.yaml"
 grep -q "Ada Lovelace" "$H1/.claude/commands/gm.md" && pass "name substituted into /gm"         || fail "name missing from gm.md"
+grep -q "Ada Lovelace" "$H1/.cursor/commands/gm.md" && pass "name substituted into Cursor /gm"  || fail "name missing from Cursor gm.md"
 grep -qF "@$COS/CLAUDE.md" "$H1/.claude/CLAUDE.md"  && pass "user memory imports the OS"        || fail "user memory does not import the OS"
+grep -qF "@klodr/gmail-mcp" "$COS/docs/mcp.json.example" \
+  && pass "pinned Gmail MCP package is installed" || fail "mcp.json.example missing @klodr/gmail-mcp"
+grep -qF "@cocal/google-calendar-mcp" "$COS/docs/mcp.json.example" \
+  && pass "pinned Calendar MCP package is installed" || fail "mcp.json.example missing @cocal/google-calendar-mcp"
+if grep -qE '<[a-z-]*mcp' "$COS/docs/mcp.json.example" "$COS/docs/mcp-servers.md"; then
+  fail "placeholder MCP package names remain in installed docs"
+else
+  pass "no placeholder MCP package names in installed docs"
+fi
 
 # -------------------------------------------------------------------------- 4. idempotency
 head_ "4. re-running changes nothing"
