@@ -4,9 +4,9 @@ A personal chief-of-staff OS for [Cursor](https://cursor.com) and
 [Claude Code](https://docs.claude.com/en/docs/claude-code). Clone it, run `./install.sh`,
 open this repo in Cursor, and type `/gm`.
 
-It is files, not a service. An OS definition, four command playbooks, three state files, and a
-markdown CRM — all plain text on your machine, all readable with `cat`, all editable with the
-editor you already have open.
+It is files, not a service. An OS definition, five command playbooks, three state files, a
+markdown CRM, and a work-log — all plain text on your machine, all readable with `cat`, all
+editable with the editor you already have open.
 
 ```
 $ ./install.sh
