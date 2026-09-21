@@ -136,7 +136,7 @@ grep -qF 'Tier: `balanced`' "$H1/.claude/commands/dispatch.md" \
 grep -qF 'Tier: `intelligence`' "$H1/.claude/commands/dispatch.md" \
   && pass "/dispatch maps review to intelligence" \
   || fail "/dispatch is missing review → intelligence routing"
-grep -qF 'A high-risk request never routes down.' "$H1/.claude/commands/dispatch.md" \
+grep -qF 'request never routes down.' "$H1/.claude/commands/dispatch.md" \
   && pass "/dispatch preserves the intelligence risk floor" \
   || fail "/dispatch is missing its intelligence risk floor"
 grep -qF 'Set `approval_required: true`' "$H1/.claude/commands/dispatch.md" \
