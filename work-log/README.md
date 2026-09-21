@@ -24,6 +24,9 @@ status: open                  # open | in-progress | done | dropped
 owner:
   kind: agent                 # human | agent
   name: implement             # contact name, or explore | implement | review
+tier: balanced                # cost | balanced | intelligence
+approval_required: false      # true records a future execution gate
+approval_reasons: []          # send_email, publish, merge, production_deploy, etc.
 created: 2026-09-20
 done_when:
   - "README says how to run /gm in Cursor"
@@ -40,16 +43,21 @@ status_location: "work-log/2026-09-20-ship-readme.md and my-tasks.yaml#t-010"
 - **Out-of-scope is mandatory.** At least one exclusion. "Do the obvious thing" is not a scope.
 - **Status updates append** under `## Status`, dated. Do not rewrite the request.
 - **One owner.** Split the work rather than stacking roles.
+- **Tier is effort, not permission.** `explore` defaults to `cost`, `implement` to `balanced`,
+  and `review` to `intelligence`. High-risk work can only move up.
+- **Approval is explicit.** A send, publish, merge, production deploy, financial transaction,
+  or deletion sets `approval_required: true`. The assignment approval does not approve that
+  later action.
 - **Drop is a status**, not a delete. Keep the file.
 - **No secrets, no employer IP.** Treat this directory as publishable.
 
 ## Agent roles
 
-| Role | May | May not |
-| --- | --- | --- |
-| `explore` | Read, write findings to `status_location` | Edit product code, send, merge |
-| `implement` | Edit on a branch, run tests | Merge, send, create repos, expand scope |
-| `review` | Read a diff, write findings | Approve, merge, or "just fix it" |
+| Role | Default tier | May | May not |
+| --- | --- | --- | --- |
+| `explore` | `cost` | Read, write findings to `status_location` | Edit product code, send, merge |
+| `implement` | `balanced` | Edit on a branch, run tests | Merge, send, create repos, expand scope |
+| `review` | `intelligence` | Read a diff, write findings | Approve, merge, or "just fix it" |
 
 ## Files here
 

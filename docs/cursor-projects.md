@@ -46,10 +46,21 @@ A Cursor Project around this repo is optional. It is useful when you want a coor
 `/dispatch` writes a file, not a ticket by default:
 
 - **Owner** is either a human engineer (name as in `contacts/`) or a named agent role: `explore`, `implement`, `review`.
+- **Tier** is execution effort, not permission: `explore` → `cost`, `implement` → `balanced`,
+  `review` → `intelligence`. Security, auth, payments, production, destructive changes, and
+  external sends are always `intelligence`.
+- **Approval fields** record future gates. Send, publish, merge, production deploy, financial
+  transaction, and deletion require a fresh yes immediately before execution.
 - **Done-when**, **out-of-scope**, and **status location** are mandatory. An assignment without those is a vibe, and the command refuses to write it.
 - GitHub issues / PRs are optional follow-on writes. They use the same approval protocol as email. If GitHub MCP is missing, the assignment stays a file and the command says so in one line.
 
 The Project coordinator may *be* the `implement` or `review` owner. It does not get to skip `out-of-scope` or to merge, send, or publish without the operator.
+
+The runtime maps tiers to models. A cost-tier `explore` worker should use an explicitly selected
+cheap model (for this Project, `composer-2.5`) rather than inheriting the coordinator's model.
+Cap retries at two; retry a transient failure once at the same tier, escalate a failed result,
+and stop on authentication, entitlement, invalid-model, cancellation, or approval errors.
+No live Jev service is required for this deterministic mapping.
 
 ## What not to do
 

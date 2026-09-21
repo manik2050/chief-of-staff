@@ -5,6 +5,9 @@ status: open
 owner:
   kind: human
   name: Name As In Contacts
+tier: balanced
+approval_required: false
+approval_reasons: []
 created: YYYY-MM-DD
 done_when:
   - "observable outcome"

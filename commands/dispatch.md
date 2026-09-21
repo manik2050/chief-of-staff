@@ -15,8 +15,8 @@ It writes one file under `work-log/`. It may append a matching task to `my-tasks
 **never sends**, never opens a GitHub issue or PR, and never merges, unless {{NAME}} approves
 that specific write in a later turn using CLAUDE.md §4.
 
-If you cannot name an owner, a done-when, an out-of-scope, and a status location, you do not
-write the file. Ask at most one question, then stop.
+If you cannot name an owner, a tier, a done-when, an out-of-scope, and a status location, you
+do not write the file. Ask at most one question, then stop.
 
 ## Arguments
 
@@ -35,26 +35,40 @@ write the file. Ask at most one question, then stop.
 1. **Load** `paths.json`, `goals.yaml`, `my-tasks.yaml`, the file list of `work-log/`, and
    `contacts/`. If `goals.yaml` is missing, stop — you cannot assign work you cannot rank.
 
-2. **Parse the request.** You need four facts before writing anything. Pull them from
+2. **Parse the request.** You need these facts before writing anything. Pull them from
    `$ARGUMENTS` and recent conversation. Missing facts become **one** question, then stop:
 
    | Field | What good looks like |
    | --- | --- |
    | `goal` | An id that exists in `goals.yaml`. Unaligned work is allowed only if {{NAME}} says so. |
    | `owner` | A human in `contacts/` **or** a named agent role: `explore`, `implement`, `review`. |
+   | `tier` | `cost`, `balanced`, or `intelligence`, selected by step 3. |
+   | `approval_required` | `true` only when execution has an external or irreversible side effect. |
+   | `approval_reasons` | Concrete gated actions, or `[]`. |
    | `done_when` | Observable outcome. "Look into X" is not done-when. "PR open with tests green" is. |
    | `out_of_scope` | At least one concrete exclusion. Empty out-of-scope is a defect. |
    | `status_location` | Where the owner writes progress. Default: this assignment file, plus a `my-tasks.yaml` id. |
 
-3. **Pick the owner using this rule, and say which you chose:**
+3. **Pick the owner and tier using this deterministic rule, and say which you chose:**
    - `explore` — read-only research. May write only to `status_location`. No code edits, no
-     sends, no merges.
+     sends, no merges. **Tier: `cost`.**
    - `implement` — may edit code on a branch. No merge, no send, no new repos, no scope beyond
-     the file.
+     the file. **Tier: `balanced`.**
    - `review` — read a diff, write findings to `status_location`. No approve/merge without
-     {{NAME}}.
+     {{NAME}}. **Tier: `intelligence`.**
    - a **human** — name them as in `contacts/`. If they have no contact file, create one from
      the template at `tier: cold` only after listing them as a new person and getting a yes.
+     Use `balanced` unless the request is clearly short/read-only (`cost`) or high-risk
+     (`intelligence`).
+
+   Raise any owner to **`intelligence`** when the request touches security, authentication,
+   secrets, payments, production, destructive changes, or an external send. A high-risk
+   request never routes down.
+
+   Set `approval_required: true` and list `approval_reasons` for any send, publish, merge,
+   production deploy, financial transaction, or data deletion. This records a future gate; it
+   is not approval. `/dispatch` still asks before writing every assignment, and the owner must
+   ask again immediately before the gated action under CLAUDE.md §4.
 
    Never invent a fourth agent role. Never assign "the model" or "whoever is free".
 
@@ -68,6 +82,8 @@ write the file. Ask at most one question, then stop.
 
    Goal:     <id> (<priority>)
    Owner:    <human name | explore | implement | review>
+   Tier:     <cost | balanced | intelligence>
+   Approval: <not required | required: reason, reason>
    Done when:
      - <observable>
    Out of scope:
@@ -82,8 +98,9 @@ write the file. Ask at most one question, then stop.
 
 6. **On yes, write** `work-log/YYYY-MM-DD-<slug>.md` using `_template.md`. Fill every frontmatter
    field. `id` is `d-YYYYMMDD-<slug>`. `status` is `open`. `created` is today in {{TIMEZONE}}.
-   Body sections: Request, Done when, Out of scope, Owner, Status. No secrets. No employer
-   names, product metrics, or internal architecture.
+   Record `tier`, `approval_required`, and `approval_reasons` exactly as presented. Body
+   sections: Request, Done when, Out of scope, Owner, Status. No secrets. No employer names,
+   product metrics, or internal architecture.
 
 7. **Ledger the loop.** Append a task to `my-tasks.yaml`:
    - `id` from `next_id`, then increment
@@ -117,6 +134,9 @@ write the file. Ask at most one question, then stop.
 ## Guardrails
 
 - Never send, comment, open, merge, or close anything without the approval protocol.
+- A tier selects execution effort; it never grants permission. `intelligence` is not approval.
+- Bypass or missing routing tools may choose `balanced`, but may not remove a risk floor or
+  approval reason.
 - Never expand scope in the assignment after the operator approved it. A change of scope is a
   new yes.
 - Never assign work that conflicts with a `hard: true` protected block as if it were due today.

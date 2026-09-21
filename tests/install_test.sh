@@ -117,6 +117,37 @@ check_file "$H1/.cursor/commands/gm.md"
 check_file "$H1/.cursor/commands/dispatch.md"
 check_file "$H1/.claude/CLAUDE.md"
 
+grep -q '^tier: balanced$' "$COS/work-log/_template.md" \
+  && pass "work-log template includes a routing tier" \
+  || fail "work-log template is missing its routing tier"
+grep -q '^approval_required: false$' "$COS/work-log/_template.md" \
+  && pass "work-log template includes the approval gate" \
+  || fail "work-log template is missing its approval gate"
+grep -q '^approval_reasons: \[\]$' "$COS/work-log/_template.md" \
+  && pass "work-log template includes approval reasons" \
+  || fail "work-log template is missing approval reasons"
+grep -qF 'explore` — read-only research' "$H1/.claude/commands/dispatch.md" \
+  && grep -qF 'Tier: `cost`' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch maps explore to cost" \
+  || fail "/dispatch is missing explore → cost routing"
+grep -qF 'Tier: `balanced`' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch maps implement to balanced" \
+  || fail "/dispatch is missing implement → balanced routing"
+grep -qF 'Tier: `intelligence`' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch maps review to intelligence" \
+  || fail "/dispatch is missing review → intelligence routing"
+grep -qF 'request never routes down.' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch preserves the intelligence risk floor" \
+  || fail "/dispatch is missing its intelligence risk floor"
+grep -qF 'Set `approval_required: true`' "$H1/.claude/commands/dispatch.md" \
+  && grep -qF 'ask again immediately before the gated action' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch records gates without treating them as approval" \
+  || fail "/dispatch approval gates are incomplete"
+grep -qF 'Bypass or missing routing tools may choose `balanced`' \
+    "$H1/.cursor/commands/dispatch.md" \
+  && pass "Cursor /dispatch keeps policy active during routing bypass" \
+  || fail "Cursor /dispatch can bypass routing policy"
+
 if command -v python3 >/dev/null 2>&1; then
   check_file "$COS/paths.json"
   # Compare resolved against resolved: paths.py canonicalizes, so anything under a symlinked
