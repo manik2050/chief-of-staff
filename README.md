@@ -49,8 +49,9 @@ relationships, and refuses to propose outreach without a specific reason to reac
 
 **`/dispatch`** — the multi-agent layer. Takes a goal id and a work request, writes
 `work-log/YYYY-MM-DD-<slug>.md` with an owner (a human engineer or `explore` / `implement` /
-`review`), done-when, out-of-scope, and where status goes. File-native. GitHub is optional and
-still needs a yes.
+`review`), an execution tier (`cost` / `balanced` / `intelligence`), explicit approval gates,
+done-when, out-of-scope, and where status goes. File-native. GitHub is optional and still needs
+a yes.
 
 ## It will not send anything without you
 
