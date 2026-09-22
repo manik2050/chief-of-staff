@@ -19,8 +19,9 @@ contacts/          CRM: README (schema), _template.md, one worked example
 work-log/          assignments: README, _template.md; /dispatch writes the rest
 templates/         weekly-status.md (used by /my-tasks status)
 core/paths.py      the path contract; nothing else may build paths
-docs/              mcp-servers.md, cursor-projects.md, roadmap.md
-.cursor/           project rule, mcp.json.example, command links
+docs/              mcp-servers.md, cursor-projects.md, pstack.md, roadmap.md
+.cursor/           project rule, pstack-execution rule, settings.json (pstack on),
+                   mcp.json.example, command links
 install.sh         the installer
 tests/             shell tests for the installer
 ```
@@ -48,6 +49,10 @@ tests/             shell tests for the installer
    and `$TMPDIR` sits under `/var` -> `/private/var`, so an unresolved path and a resolved one
    name the same directory while comparing unequal. Shell code uses the `canonicalize` helper
    (`pwd -P` on the deepest existing ancestor), never `realpath(1)`, which older macOS lacks.
+8. **pstack is enabled, not vendored.** `.cursor/settings.json` turns the marketplace plugin
+   on for this repo. Do not copy pstack `SKILL.md` files into `skills/`. That directory is
+   reserved for this kit's own packaging. Agent owners run the playbook `/dispatch` wrote;
+   CLAUDE.md §4 still gates send, merge, and publish. See `docs/pstack.md`.
 
 ## Writing a command playbook
 
@@ -106,6 +111,8 @@ It asserts:
 - a symlinked install root resolves consistently across the OS file, the import line, and
   `paths.json`, and stays idempotent when re-run through the symlink
 - `paths.json` lists `work_log` next to `briefings` / `drafts`
+- `/dispatch` maps explore → investigation, implement → feature, review → interrogate, and
+  degrades to `execution: null` when pstack is off
 
 Add a case to it for anything you change in `install.sh`.
 

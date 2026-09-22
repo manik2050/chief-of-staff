@@ -110,7 +110,7 @@ Preview without writing anything:
     ├── briefings/  drafts/        # written by the agent
     ├── templates/weekly-status.md
     ├── core/paths.py
-    └── docs/                      # mcp-servers.md, cursor-projects.md, mcp.json.example
+    └── docs/                      # mcp-servers.md, cursor-projects.md, pstack.md, mcp.json.example
 
 ~/.cursor/commands/                # same playbooks, for Cursor slash commands
 ```
@@ -184,7 +184,13 @@ also wires user-level slash commands.
    draft-only Gmail scopes — [`docs/mcp-servers.md`](docs/mcp-servers.md). Do not commit the
    filled file.
 
-4. **Rewrite `goals.yaml`** in the install root. Then type `/gm`.
+4. **Reload so pstack is live.** `.cursor/settings.json` already enables the
+   [pstack](https://cursor.com/marketplace/cursor/pstack) plugin for this folder. Run
+   `/setup-pstack` once on the machine to pick models. `/dispatch` names the playbook; the
+   owner runs `/poteto-mode` (or `/interrogate` for review). CLAUDE.md §4 still wins if a
+   playbook would send or merge. Details: [`docs/pstack.md`](docs/pstack.md).
+
+5. **Rewrite `goals.yaml`** in the install root. Then type `/gm`.
 
    If slash commands are not listed yet, send the message `/gm`. The rule treats that as
    "run `commands/gm.md`". Same for `/triage`, `/my-tasks`, `/enrich`, `/dispatch`.
@@ -205,7 +211,9 @@ How a Cursor Project coordinator differs from this CoS persona:
 
 A PARA vault, local Python MCP servers for the deterministic work, `SKILL.md` packaging, and CI
 lifecycle gates are planned but deliberately not in this release.
-[`docs/roadmap.md`](docs/roadmap.md) says what is missing and why.
+[`docs/roadmap.md`](docs/roadmap.md) says what is missing and why. Execute them as
+`/dispatch public-build ...` assignments through pstack, one item per PR — not as a
+side quest inside an unrelated change.
 
 ## Contributing
 

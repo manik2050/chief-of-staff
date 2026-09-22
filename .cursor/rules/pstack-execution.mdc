@@ -1,0 +1,43 @@
+---
+description: pstack executes dispatched engineering work; CLAUDE.md still ranks and approves.
+alwaysApply: true
+---
+
+# pstack is the execution engine, not a second OS
+
+This repository enables the [pstack](https://cursor.com/marketplace/cursor/pstack) plugin in
+`.cursor/settings.json`. Agent owners (`explore`, `implement`, `review`) run through it.
+The Chief of Staff persona still loads from `CLAUDE.md`. Mapping: `docs/pstack.md`.
+
+## Which file wins
+
+`CLAUDE.md` §4 outranks every pstack playbook, including poteto-mode autonomy defaults.
+
+That means:
+
+- Never send email, chat, invites, RSVPs, comments, or any publish/transmit call without the
+  in-the-moment approval block. Draft, show the full text, stop. Do not send in the same turn.
+- Never merge, force-push, deploy, or delete production data without a fresh yes.
+- Never treat "never block on the human" as permission to skip those gates.
+- Never use autopilot-full (merge as you go). Stack PRs for the operator to land.
+- Never expand a work-log assignment past its `out_of_scope`.
+
+A pstack playbook that would merge, send, or publish stops at the PR (or the draft) and writes
+status to the assignment file.
+
+## How an agent owner starts
+
+1. Read the assignment named in the request (`work-log/YYYY-MM-DD-<slug>.md`).
+2. Read `docs/pstack.md` if the playbook or the override above is unclear.
+3. Run the playbook in the assignment's `execution` field via `/poteto-mode` (or `/interrogate`
+   for `review`). If `execution` is `null`, do not invent a playbook.
+4. Write progress under `## Status`. Do not rewrite the request.
+
+If pstack skills do not resolve in this workspace, say "pstack unavailable" in one line and
+continue with the assignment's owner/tier rules only.
+
+## Do not
+
+- Copy pstack skills into `skills/`. That directory is reserved for this kit's own packaging.
+- Replace `goals.yaml` with a pstack store, trail, or orchestrate board.
+- Let a coordinator chat send mail or book meetings because pstack said to proceed.

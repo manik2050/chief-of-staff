@@ -15,27 +15,36 @@ an oversight or a decision.
 - `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`
 - `contacts/` as a dated, append-only markdown CRM
 - `work-log/` as file-native assignments to humans and agent roles
-- Cursor project rule, `.cursor/mcp.json.example`, `docs/cursor-projects.md`
+- Cursor project rule, `.cursor/mcp.json.example`, `.cursor/settings.json` (pstack on),
+  `docs/cursor-projects.md`, `docs/pstack.md`
 - `core/paths.py` — a single path contract, plus a generated `paths.json`
 - `install.sh` — idempotent, non-destructive, placeholder substitution at install time
 
 ## Later
 
+These items are dispatched, not invented ad hoc. `/dispatch public-build <item>` writes the
+assignment; pstack runs the named playbook (`docs/pstack.md`). One item per dispatch. Do not
+start all four because the plugin is on.
+
 **PARA vault.** State currently lives as a flat set of files under the install root. A
 Projects / Areas / Resources / Archive vault gives commands a place to put research, meeting
 notes, and long-lived reference material without every command inventing its own layout.
 `core/paths.py` already reserves `vault/` for this, so nothing will need to move.
+First dispatch: `explore` / `investigation`. Then `implement` / `feature`.
 
 **Python MCP servers.** Some things the OS wants — cadence computation across the whole CRM,
 capacity math against the calendar, task staleness sweeps — are deterministic and should not be
 done by a language model one file at a time. Those become local MCP servers that expose a few
 typed tools. `paths.json` exists so a server written later reads the same contract as the
 commands written today, and `mcp/` is reserved for them.
+First dispatch: `implement` / `feature`, after `/architect` on the tool surface. One server
+per PR.
 
 **`SKILL.md` packaging.** Commands are markdown playbooks executed by the agent. As they grow,
 the reusable parts (drafting in the operator's voice, tiering, cadence math) should be extracted
 into skills that several commands share, rather than being restated in each playbook. `skills/`
-is reserved.
+is reserved. Do not copy pstack skills into it.
+First dispatch: `implement` / `authoring-a-skill`. One skill per PR.
 
 **CI and lifecycle gates.** The checks that keep a kit like this honest:
 - schema validation for `goals.yaml`, `my-tasks.yaml`, `schedules.yaml` and contact frontmatter
@@ -46,6 +55,7 @@ is reserved.
 - a check that every `{{PLACEHOLDER}}` in the repo is one the installer actually substitutes
 
 `tests/install_test.sh` is the first of these. The rest follow once the file formats stop moving.
+First dispatch: `implement` / `feature`. Add a case to the existing test; do not weaken it.
 
 ## Deliberately out of scope
 

@@ -310,6 +310,7 @@ say "Support files"
 copy_if_missing "$SCRIPT_DIR/core/paths.py"               "$COS_HOME/core/paths.py" --raw
 copy_if_missing "$SCRIPT_DIR/docs/mcp-servers.md"         "$COS_HOME/docs/mcp-servers.md"
 copy_if_missing "$SCRIPT_DIR/docs/cursor-projects.md"     "$COS_HOME/docs/cursor-projects.md"
+copy_if_missing "$SCRIPT_DIR/docs/pstack.md"              "$COS_HOME/docs/pstack.md"
 copy_if_missing "$SCRIPT_DIR/.cursor/mcp.json.example"    "$COS_HOME/docs/mcp.json.example" --raw
 
 # The path contract is generated, not authored, so regenerating it is not a destructive write.

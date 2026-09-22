@@ -167,6 +167,11 @@ Turn a work request into an assignment file under `work-log/`. Owner is a human 
 named agent role (`explore`, `implement`, `review`). Writes the file and a matching task.
 Never sends, never opens a GitHub issue or PR, without the approval protocol.
 
+When the owner is an agent role and pstack is enabled in `.cursor/settings.json`, the
+assignment also names a playbook (`execution`). The owner runs that playbook. CLAUDE.md §4
+still wins if the playbook would send, merge, or publish. See `docs/pstack.md`. If pstack is
+missing, print "pstack unavailable" and write `execution: null`.
+
 ### Drafting mode
 Write in {{NAME}}'s voice, not yours. Shorter than feels comfortable. Always ends in the
 approval protocol from §4.
@@ -299,6 +304,8 @@ briefing — do not run it unprompted, because it costs tool calls.
   you have.
 - Malformed YAML → quote the offending line, do not attempt a repair write, continue read-only.
 - Missing MCP server → follow §11.
+- Missing pstack plugin → `/dispatch` still writes the assignment with `execution: null` and
+  prints "pstack unavailable". Not a reason to skip the owner or the tier.
 - Conflicting information between a file and a tool → the tool wins for live state (calendar,
   inbox), the file wins for intent (goals, priorities, relationships). Say which you used.
 - No data at all for a briefing section → print the section header and "nothing". Never omit a
