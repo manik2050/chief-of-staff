@@ -347,6 +347,30 @@ else
   printf '  skip  PyYAML not installed\n'
 fi
 
+# ----------------------------------------------- 10. CI workflow; build-log stays in the repo
+head_ "10. CI runs the installer test; build-log is repo-only"
+WF="$REPO_DIR/.github/workflows/install-test.yml"
+if [ -f "$WF" ] && grep -q './tests/install_test.sh' "$WF"; then
+  pass "CI workflow runs ./tests/install_test.sh"
+else
+  fail "CI workflow missing or does not invoke ./tests/install_test.sh"
+fi
+if grep -q 'branches: \[main\]' "$WF" && grep -q 'pull_request:' "$WF"; then
+  pass "CI workflow runs on pull requests and on main"
+else
+  fail "CI workflow does not trigger on pull requests and main"
+fi
+if [ -e "$COS/docs/build-log" ]; then
+  fail "installer copied docs/build-log into the install root"
+else
+  pass "docs/build-log is not installed (repo-only)"
+fi
+if [ -e "$COS/.github" ]; then
+  fail "installer copied .github into the install root"
+else
+  pass ".github is not installed (repo-only)"
+fi
+
 # -------------------------------------------------------------------------------- summary
 printf '\n%s passed, %s failed\n' "$PASSED" "$FAILED"
 [ "$FAILED" -eq 0 ]

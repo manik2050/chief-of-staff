@@ -1,0 +1,22 @@
+# Run the installer regression suite on every pull request and on main.
+# The script is bash 3.2-friendly (macOS default). This job runs it on Linux
+# as the first CI cut; a macOS matrix is later (docs/roadmap.md).
+name: Installer test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  install-test:
+    name: ./tests/install_test.sh
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Run installer test
+        run: ./tests/install_test.sh
