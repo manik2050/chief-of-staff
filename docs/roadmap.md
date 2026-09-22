@@ -19,6 +19,7 @@ an oversight or a decision.
   `docs/cursor-projects.md`, `docs/pstack.md`
 - `core/paths.py` — a single path contract, plus a generated `paths.json`
 - `install.sh` — idempotent, non-destructive, placeholder substitution at install time
+- CI first cut — GitHub Actions runs `./tests/install_test.sh` on pull requests and on `main`
 
 ## Later
 
@@ -54,8 +55,10 @@ First dispatch: `implement` / `authoring-a-skill`. One skill per PR.
   conflicting `~/.claude`, and install through a symlinked root
 - a check that every `{{PLACEHOLDER}}` in the repo is one the installer actually substitutes
 
-`tests/install_test.sh` is the first of these. The rest follow once the file formats stop moving.
-First dispatch: `implement` / `feature`. Add a case to the existing test; do not weaken it.
+`.github/workflows/install-test.yml` runs `tests/install_test.sh` on pull requests and on
+`main`. That is the first cut. Schema validation, playbook lint, a secret scan, and a
+macOS/Linux matrix follow once the file formats stop moving. Add a case to the existing
+test; do not weaken it.
 
 ## Deliberately out of scope
 

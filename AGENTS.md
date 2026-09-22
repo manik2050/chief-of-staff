@@ -19,9 +19,11 @@ contacts/          CRM: README (schema), _template.md, one worked example
 work-log/          assignments: README, _template.md; /dispatch writes the rest
 templates/         weekly-status.md (used by /my-tasks status)
 core/paths.py      the path contract; nothing else may build paths
-docs/              mcp-servers.md, cursor-projects.md, pstack.md, roadmap.md
+docs/              mcp-servers.md, cursor-projects.md, pstack.md, roadmap.md,
+                   build-log/ (public shipping notes; not installed)
 .cursor/           project rule, pstack-execution rule, settings.json (pstack on),
                    mcp.json.example, command links
+.github/           workflows/install-test.yml — runs tests/install_test.sh
 install.sh         the installer
 tests/             shell tests for the installer
 ```
@@ -113,6 +115,8 @@ It asserts:
 - `paths.json` lists `work_log` next to `briefings` / `drafts`
 - `/dispatch` maps explore → investigation, implement → feature, review → interrogate, and
   degrades to `execution: null` when pstack is off
+- `.github/workflows/install-test.yml` exists and invokes `./tests/install_test.sh`
+- `docs/build-log/` stays in the repo and is not copied into the install root
 
 Add a case to it for anything you change in `install.sh`.
 

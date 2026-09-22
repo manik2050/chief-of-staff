@@ -209,8 +209,9 @@ How a Cursor Project coordinator differs from this CoS persona:
 
 ## Roadmap
 
-A PARA vault, local Python MCP servers for the deterministic work, `SKILL.md` packaging, and CI
-lifecycle gates are planned but deliberately not in this release.
+A PARA vault, local Python MCP servers for the deterministic work, and `SKILL.md` packaging
+are planned but deliberately not in this release. The installer test now runs on every pull
+request and on `main`; remaining CI gates wait until the file formats settle.
 [`docs/roadmap.md`](docs/roadmap.md) says what is missing and why. Execute them as
 `/dispatch public-build ...` assignments through pstack, one item per PR — not as a
 side quest inside an unrelated change.
