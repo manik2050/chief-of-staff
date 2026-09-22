@@ -43,27 +43,35 @@ do not write the file. Ask at most one question, then stop.
    | `goal` | An id that exists in `goals.yaml`. Unaligned work is allowed only if {{NAME}} says so. |
    | `owner` | A human in `contacts/` **or** a named agent role: `explore`, `implement`, `review`. |
    | `tier` | `cost`, `balanced`, or `intelligence`, selected by step 3. |
+   | `execution` | A pstack playbook name from the table in step 3, or `null`. |
    | `approval_required` | `true` only when execution has an external or irreversible side effect. |
    | `approval_reasons` | Concrete gated actions, or `[]`. |
    | `done_when` | Observable outcome. "Look into X" is not done-when. "PR open with tests green" is. |
    | `out_of_scope` | At least one concrete exclusion. Empty out-of-scope is a defect. |
    | `status_location` | Where the owner writes progress. Default: this assignment file, plus a `my-tasks.yaml` id. |
 
-3. **Pick the owner and tier using this deterministic rule, and say which you chose:**
+3. **Pick the owner, tier, and execution using this deterministic rule, and say which you
+   chose:**
    - `explore` — read-only research. May write only to `status_location`. No code edits, no
-     sends, no merges. **Tier: `cost`.**
+     sends, no merges. **Tier: `cost`.** **Execution: `investigation`.**
    - `implement` — may edit code on a branch. No merge, no send, no new repos, no scope beyond
-     the file. **Tier: `balanced`.**
+     the file. **Tier: `balanced`.** **Execution: `feature`.** Use `refactoring` when the
+     request is shape-only, or `authoring-a-skill` when it is SKILL.md packaging.
    - `review` — read a diff, write findings to `status_location`. No approve/merge without
-     {{NAME}}. **Tier: `intelligence`.**
+     {{NAME}}. **Tier: `intelligence`.** **Execution: `interrogate`.**
    - a **human** — name them as in `contacts/`. If they have no contact file, create one from
      the template at `tier: cold` only after listing them as a new person and getting a yes.
      Use `balanced` unless the request is clearly short/read-only (`cost`) or high-risk
-     (`intelligence`).
+     (`intelligence`). **Execution: `null`.**
 
    Raise any owner to **`intelligence`** when the request touches security, authentication,
    secrets, payments, production, destructive changes, or an external send. A high-risk
    request never routes down.
+
+   `execution` is the pstack playbook the agent owner runs (`docs/pstack.md`). Read
+   `.cursor/settings.json`. If `plugins.pstack.enabled` is not true, set `execution` to
+   `null` and print "pstack unavailable — owner runs without a named playbook". The
+   assignment is still valid. Never invent a playbook name that is not in the list above.
 
    Set `approval_required: true` and list `approval_reasons` for any send, publish, merge,
    production deploy, financial transaction, or data deletion. This records a future gate; it
@@ -83,6 +91,7 @@ do not write the file. Ask at most one question, then stop.
    Goal:     <id> (<priority>)
    Owner:    <human name | explore | implement | review>
    Tier:     <cost | balanced | intelligence>
+   Execution: <investigation | feature | refactoring | authoring-a-skill | interrogate | none>
    Approval: <not required | required: reason, reason>
    Done when:
      - <observable>
@@ -98,9 +107,10 @@ do not write the file. Ask at most one question, then stop.
 
 6. **On yes, write** `work-log/YYYY-MM-DD-<slug>.md` using `_template.md`. Fill every frontmatter
    field. `id` is `d-YYYYMMDD-<slug>`. `status` is `open`. `created` is today in {{TIMEZONE}}.
-   Record `tier`, `approval_required`, and `approval_reasons` exactly as presented. Body
-   sections: Request, Done when, Out of scope, Owner, Status. No secrets. No employer names,
-   product metrics, or internal architecture.
+   Record `tier`, `execution`, `approval_required`, and `approval_reasons` exactly as
+   presented. Write `execution: null` when the owner is a human or pstack is unavailable.
+   Body sections: Request, Done when, Out of scope, Owner, Status. No secrets. No employer
+   names, product metrics, or internal architecture.
 
 7. **Ledger the loop.** Append a task to `my-tasks.yaml`:
    - `id` from `next_id`, then increment
@@ -122,6 +132,7 @@ do not write the file. Ask at most one question, then stop.
    ```
    Wrote: work-log/<file>
    Task:  <t-NNN>  waiting on <owner>
+   Execution: <playbook | pstack unavailable>
    GitHub: <not requested | unavailable | READY TO SEND draft below>
 
    Open dispatches: <N>
@@ -135,7 +146,11 @@ do not write the file. Ask at most one question, then stop.
 
 - Never send, comment, open, merge, or close anything without the approval protocol.
 - A tier selects execution effort; it never grants permission. `intelligence` is not approval.
+- A named pstack playbook does not grant permission either. CLAUDE.md §4 still wins if
+  poteto-mode would send, merge, or publish. See `docs/pstack.md`.
 - Bypass or missing routing tools may choose `balanced`, but may not remove a risk floor or
+  approval reason.
+- Missing pstack may set `execution` to `null`. It may not drop the owner, the tier, or an
   approval reason.
 - Never expand scope in the assignment after the operator approved it. A change of scope is a
   new yes.

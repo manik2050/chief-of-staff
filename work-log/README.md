@@ -25,6 +25,7 @@ owner:
   kind: agent                 # human | agent
   name: implement             # contact name, or explore | implement | review
 tier: balanced                # cost | balanced | intelligence
+execution: feature            # pstack playbook, or null (human / pstack off)
 approval_required: false      # true records a future execution gate
 approval_reasons: []          # send_email, publish, merge, production_deploy, etc.
 created: 2026-09-20
@@ -45,6 +46,9 @@ status_location: "work-log/2026-09-20-ship-readme.md and my-tasks.yaml#t-010"
 - **One owner.** Split the work rather than stacking roles.
 - **Tier is effort, not permission.** `explore` defaults to `cost`, `implement` to `balanced`,
   and `review` to `intelligence`. High-risk work can only move up.
+- **Execution is the playbook, not a fourth role.** `investigation`, `feature`,
+  `refactoring`, `authoring-a-skill`, or `interrogate` when pstack is enabled; `null`
+  otherwise. The owner line stays a single noun.
 - **Approval is explicit.** A send, publish, merge, production deploy, financial transaction,
   or deletion sets `approval_required: true`. The assignment approval does not approve that
   later action.
@@ -53,11 +57,15 @@ status_location: "work-log/2026-09-20-ship-readme.md and my-tasks.yaml#t-010"
 
 ## Agent roles
 
-| Role | Default tier | May | May not |
-| --- | --- | --- | --- |
-| `explore` | `cost` | Read, write findings to `status_location` | Edit product code, send, merge |
-| `implement` | `balanced` | Edit on a branch, run tests | Merge, send, create repos, expand scope |
-| `review` | `intelligence` | Read a diff, write findings | Approve, merge, or "just fix it" |
+| Role | Default tier | Default `execution` | May | May not |
+| --- | --- | --- | --- | --- |
+| `explore` | `cost` | `investigation` | Read, write findings to `status_location` | Edit product code, send, merge |
+| `implement` | `balanced` | `feature` | Edit on a branch, run tests | Merge, send, create repos, expand scope |
+| `review` | `intelligence` | `interrogate` | Read a diff, write findings | Approve, merge, or "just fix it" |
+
+`execution` is the pstack playbook the owner runs when the plugin is on (`docs/pstack.md`).
+It is `null` for a human owner, and `null` when pstack is unavailable. A playbook is not
+permission: CLAUDE.md §4 still gates send, merge, and publish.
 
 ## Files here
 

@@ -42,4 +42,4 @@ If the client does not expand slash commands, treat a user message that is exact
 
 ## This is not a Cursor Project coordinator
 
-A Cursor Project coordinator assigns workers and owns shared store files (`notes.md`, `docs/`). You are the CoS persona: one operator, modes, YAML state, approval-before-send. Mapping: `docs/cursor-projects.md`. Do not rename this repo into a Project, and do not treat Project store paths as the product.
+A Cursor Project coordinator assigns workers and owns shared store files (`notes.md`, `docs/`). You are the CoS persona: one operator, modes, YAML state, approval-before-send. Mapping: `docs/cursor-projects.md`. Agent owners execute through pstack (`docs/pstack.md`); `CLAUDE.md` §4 still wins. Do not rename this repo into a Project, and do not treat Project store paths as the product.

@@ -36,10 +36,11 @@ Do not collapse the two. A coordinator that starts sending email has left its jo
 1. Clone this repo and open it in Cursor. The project rule `@`'s `CLAUDE.md` and lists the commands.
 2. Run `./install.sh` so placeholders fill and playbooks land in `~/.cursor/commands/` as well as `~/.claude/commands/`.
 3. Copy `.cursor/mcp.json.example` to `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (this workspace). Fill in the calendar credentials path. Authenticate the Gmail and Calendar servers — see [`mcp-servers.md`](mcp-servers.md). Never commit the filled file.
-4. Rewrite `goals.yaml`. The shipped goals are a generic TPM operator, not yours.
-5. Type `/gm`. If slash commands are not wired yet, send the message `/gm` and the rule tells the agent to execute `commands/gm.md`.
+4. Reload Cursor so project-scoped pstack from `.cursor/settings.json` is live. Run `/setup-pstack` once on the machine to pick models. See [`pstack.md`](pstack.md).
+5. Rewrite `goals.yaml`. The shipped goals are a generic TPM operator, not yours.
+6. Type `/gm`. If slash commands are not wired yet, send the message `/gm` and the rule tells the agent to execute `commands/gm.md`.
 
-A Cursor Project around this repo is optional. It is useful when you want a coordinator to fan `/dispatch` work to isolated agents. The CoS still ranks that work against `goals.yaml` and still will not send without a yes.
+A Cursor Project around this repo is optional. It is useful when you want a coordinator to fan `/dispatch` work to isolated agents. Those agents execute through pstack when the plugin is on (`.cursor/settings.json`). The CoS still ranks that work against `goals.yaml` and still will not send without a yes.
 
 ## `/dispatch` is the bridge
 
@@ -56,11 +57,13 @@ A Cursor Project around this repo is optional. It is useful when you want a coor
 
 The Project coordinator may *be* the `implement` or `review` owner. It does not get to skip `out-of-scope` or to merge, send, or publish without the operator.
 
-The runtime maps tiers to models. A cost-tier `explore` worker should use an explicitly selected
-cheap model (for this Project, `composer-2.5`) rather than inheriting the coordinator's model.
+The runtime maps tiers to models **and** owners to pstack playbooks. Mapping:
+[`docs/pstack.md`](pstack.md). A cost-tier `explore` worker runs Investigation; it should
+use a cheap model from `/setup-pstack` rather than inheriting the coordinator's model.
 Cap retries at two; retry a transient failure once at the same tier, escalate a failed result,
 and stop on authentication, entitlement, invalid-model, cancellation, or approval errors.
-No live Jev service is required for this deterministic mapping.
+No live Jev service is required for this deterministic mapping. pstack missing is not a
+routing failure: print "pstack unavailable" and keep the owner and tier.
 
 ## What not to do
 

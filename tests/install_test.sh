@@ -107,6 +107,7 @@ check_file "$COS/work-log/_template.md"
 check_file "$COS/work-log/README.md"
 check_file "$COS/templates/weekly-status.md"
 check_file "$COS/docs/cursor-projects.md"
+check_file "$COS/docs/pstack.md"
 check_file "$COS/docs/mcp.json.example"
 check_file "$H1/.claude/commands/gm.md"
 check_file "$H1/.claude/commands/triage.md"
@@ -147,6 +148,36 @@ grep -qF 'Bypass or missing routing tools may choose `balanced`' \
     "$H1/.cursor/commands/dispatch.md" \
   && pass "Cursor /dispatch keeps policy active during routing bypass" \
   || fail "Cursor /dispatch can bypass routing policy"
+grep -qF '**Execution: `investigation`.**' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch maps explore to investigation" \
+  || fail "/dispatch is missing explore → investigation"
+grep -qF '**Execution: `feature`.**' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch maps implement to feature" \
+  || fail "/dispatch is missing implement → feature"
+grep -qF '**Execution: `interrogate`.**' "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch maps review to interrogate" \
+  || fail "/dispatch is missing review → interrogate"
+grep -qF 'pstack unavailable — owner runs without a named playbook' \
+    "$H1/.claude/commands/dispatch.md" \
+  && pass "/dispatch degrades when pstack is off" \
+  || fail "/dispatch is missing its pstack-unavailable line"
+grep -qE '^execution: null$' "$COS/work-log/_template.md" \
+  && pass "work-log template includes an execution playbook field" \
+  || fail "work-log template is missing its execution field"
+grep -qF 'pstack unavailable — owner runs without a named playbook' \
+    "$H1/.cursor/commands/dispatch.md" \
+  && pass "Cursor /dispatch keeps pstack degradation" \
+  || fail "Cursor /dispatch dropped pstack degradation"
+if grep -qF '"pstack"' "$REPO_DIR/.cursor/settings.json" \
+   && grep -qF '"enabled": true' "$REPO_DIR/.cursor/settings.json"; then
+  pass "repo enables pstack in .cursor/settings.json"
+else
+  fail "repo .cursor/settings.json does not enable pstack"
+fi
+grep -qF '`CLAUDE.md` §4 outranks every pstack playbook' \
+    "$REPO_DIR/.cursor/rules/pstack-execution.mdc" \
+  && pass "pstack-execution rule keeps the approval override" \
+  || fail "pstack-execution rule is missing the CLAUDE.md §4 override"
 
 if command -v python3 >/dev/null 2>&1; then
   check_file "$COS/paths.json"
