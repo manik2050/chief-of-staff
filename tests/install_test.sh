@@ -174,7 +174,7 @@ if grep -qF '"pstack"' "$REPO_DIR/.cursor/settings.json" \
 else
   fail "repo .cursor/settings.json does not enable pstack"
 fi
-grep -qF 'CLAUDE.md §4 outranks every pstack playbook' \
+grep -qF '`CLAUDE.md` §4 outranks every pstack playbook' \
     "$REPO_DIR/.cursor/rules/pstack-execution.mdc" \
   && pass "pstack-execution rule keeps the approval override" \
   || fail "pstack-execution rule is missing the CLAUDE.md §4 override"
