@@ -30,9 +30,9 @@ def resolve(name):
     hit = cache.get(name)
     if hit is not None and not expired(hit):
         return hit.ip                 # skip the hierarchy
-    ip = recursive_lookup(name)       # root, then TLD, then authoritative
-    cache.put(name, ip, ttl=answer.ttl)
-    return ip
+    answer = recursive_lookup(name)   # root, then TLD, then authoritative
+    cache.put(name, answer, ttl=answer.ttl)
+    return answer.ip
 ```
 
 The first hop of almost every request is this lookup. Caching and a TTL make
