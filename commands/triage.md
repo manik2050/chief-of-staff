@@ -7,9 +7,12 @@ argument-hint: "[optional: 'inbox' | 'slack' | 'all' | a person's name | a time 
 
 ## Description
 
-Turn a pile of inbound into three tiers, a small number of drafted responses, and a clean
-`my-tasks.yaml`. Triage is where commitments get captured; anything {{NAME}} agrees to here
-becomes a task in the same turn or it never existed.
+Turn a pile of inbound this OS owns into three tiers, a small number of drafted responses,
+and a clean `my-tasks.yaml`. Skip a channel `inbound` marks `external` unless {{NAME}} names
+a person or passes `inbox`. Grok (or any other mail bot) is not a source you re-run.
+
+Triage is where commitments get captured; anything {{NAME}} agrees to here becomes a task
+in the same turn or it never existed.
 
 Drafts are shown, never sent. Sending requires the approval protocol in CLAUDE.md §4.
 
@@ -19,20 +22,26 @@ Drafts are shown, never sent. Sending requires the approval protocol in CLAUDE.m
 
 | Value | Behavior |
 | --- | --- |
-| _(empty)_ | Triage the inbox since the last briefing, or the last 24h |
-| `inbox` | Email only |
+| _(empty)_ | Channels this OS owns (`owner: cos`) since the last briefing, or the last 24h. Skip `external` and `none`. If that leaves no source, print the handler and stop. |
+| `inbox` | Email this once, even if `owner` is `external` |
 | `slack` | Chat only (skip with a one-line note if the Slack MCP is absent) |
-| `all` | Every connected inbound source |
-| a person's name | Only threads involving that person, ignoring the time window |
-| a window (`48h`, `7d`) | Widen or narrow the lookback |
+| `all` | Every connected source this OS owns. Still skip `external` and `none`. |
+| a person's name | Only threads involving that person, including email even if `owner` is `external` |
+| a window (`48h`, `7d`) | Widen or narrow the lookback on owned channels |
 
 ## Instructions
 
-1. **Load state**: `goals.yaml`, `my-tasks.yaml`, `contacts/`. You need goals to tier and
-   contacts to know who matters. Without `goals.yaml` you cannot triage — say so and stop.
+1. **Load state**: `goals.yaml`, `my-tasks.yaml`, `schedules.yaml`, `contacts/`. You need
+   goals to tier, contacts to know who matters, and `inbound` to know which channels this OS
+   owns. Without `goals.yaml` you cannot triage — say so and stop. Missing `inbound` means
+   email is `cos` and X is `none` (CLAUDE.md §11).
 
-2. **Pull the inbound set** for the window. Collect sender, subject/thread, timestamp, and
-   whether {{NAME}} is a direct recipient or on CC. CC-only is one tier lower by default.
+2. **Pull the inbound set** for the window from channels this OS owns (CLAUDE.md §11).
+   Collect sender, subject/thread, timestamp, and whether {{NAME}} is a direct recipient or
+   on CC. CC-only is one tier lower by default. Do not call Gmail when email is `external`
+   unless `$ARGUMENTS` is `inbox` or a person's name. Do not search X, pull a timeline, or
+   paginate. If no owned source remains, print `Email is owned by <handler> — not re-triaged.
+   Pass inbox to override, or a person's name.` and stop.
 
 3. **Collapse threads.** Multiple messages from the same person on the same subject are one
    item. Report the count inside the item, not as separate items.
@@ -108,3 +117,4 @@ Drafts are shown, never sent. Sending requires the approval protocol in CLAUDE.m
   the CRM without copying the contents.
 - If you cannot tell whether something is Tier 1, it is Tier 1. Over-surfacing costs a line;
   under-surfacing costs a relationship.
+- Never scan X from this command. A named-person override is email or chat, not a timeline.

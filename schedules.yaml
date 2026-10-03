@@ -1,7 +1,9 @@
-# schedules.yaml — rhythms and protected time.
+# schedules.yaml — rhythms, protected time, and inbound ownership.
 #
 # Read before any scheduling decision. The Chief of Staff subtracts everything in this file
 # from the live calendar before proposing a single slot (see CLAUDE.md §10).
+# `inbound` names who reads mail, chat, and X (see CLAUDE.md §11). Commands skip a channel
+# they do not own.
 #
 # Days use lowercase three-letter keys: mon tue wed thu fri sat sun
 # Times are 24h local to the timezone below.
@@ -9,7 +11,7 @@
 version: 1
 owner: "{{NAME}}"
 timezone: "{{TIMEZONE}}"
-updated: "2026-09-20"
+updated: "2026-10-03"
 
 working_hours:
   mon: ["09:00", "18:00"]
@@ -93,3 +95,21 @@ briefing:
   suggest_after: "08:30"
   suggest_before: "11:00"
   archive_to: "briefings/"
+
+# Who reads each inbound channel. This OS skips a channel it does not own.
+# owner: cos | external | none | on-demand
+#   cos        — this OS reads the channel
+#   external   — another bot or human already triages it; skip unless named
+#   none       — unused; do not scan
+#   on-demand  — X only: a named contact or an x.com link already in the inputs
+# If this whole block is missing, email is cos and X is none.
+inbound:
+  email:
+    owner: external
+    handler: "Grok bot"
+  slack:
+    owner: none
+    handler: null
+  x:
+    owner: on-demand
+    handler: null

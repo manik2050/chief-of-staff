@@ -21,17 +21,21 @@ Writes to `contacts/`. Proposes outreach and never sends it.
 | _(empty)_ | Enrich everyone {{NAME}} interacted with since the last run |
 | a person's name | Deep enrichment on one contact, including external lookup if available |
 | `overdue` | Cadence report only — who is past due, with a hook for each |
-| `new` | Create contact files for people seen in the inbox or calendar with no file yet |
+| `new` | Create contact files for people seen on owned channels with no file yet |
 | `audit` | Check every contact file for schema problems and missing fields |
 
 ## Instructions
 
-1. **Load** `contacts/`, `goals.yaml`, and the last entry date in each contact file. Cadence is
-   computed from the most recent dated entry under `## Log`, never from file mtime.
+1. **Load** `contacts/`, `goals.yaml`, `schedules.yaml`, and the last entry date in each
+   contact file. Cadence is computed from the most recent dated entry under `## Log`, never
+   from file mtime. Missing `inbound` means email is `cos` and X is `none` (CLAUDE.md §11).
 
-2. **Gather interactions** since the last run: calendar attendees, email correspondents, chat
-   DMs. Group by person. One-to-one contact counts toward cadence; group meetings and automated
-   messages do not.
+2. **Gather interactions** since the last run from channels this OS owns (CLAUDE.md §11):
+   calendar attendees, email correspondents if `inbound.email.owner` is `cos`, chat DMs if
+   Slack is `cos`. Do not call Gmail when email is `external`. Do not scan X. A named-person
+   run may look that person up on X once if `inbound.x.owner` is `on-demand`. Group by
+   person. One-to-one contact counts toward cadence; group meetings and automated messages
+   do not.
 
 3. **Match to files.** Resolve each person to a `contacts/<slug>.md`. Match on email address
    first, then full name. Never merge two files automatically — if you suspect a duplicate, say
@@ -94,3 +98,4 @@ Writes to `contacts/`. Proposes outreach and never sends it.
 - Never infer a relationship tier. New contacts are `cold` until {{NAME}} says otherwise.
 - Never record speculation as fact. Anything from an external lookup is dated and attributed.
 - Never propose outreach to a `cold` contact without a hook that {{NAME}} would recognize.
+- Never scan Gmail or X to discover contacts when those channels are not `cos`.
