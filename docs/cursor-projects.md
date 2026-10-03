@@ -11,7 +11,7 @@ If you open this repository in Cursor, the CoS persona loads (see `.cursor/rules
 | Job | Assign work to workers; workers do not expand scope | Hold the board so the operator does not have to |
 | Who acts | Coordinator plus named sub-agents (explore, implement, review, …) | One persona, switching **modes** (`/gm`, `/triage`, `/dispatch`, …) |
 | Memory | Project store: `notes.md`, `docs/`, `internal/` | Install root: `goals.yaml`, `my-tasks.yaml`, `contacts/`, `work-log/` |
-| Hands | GitHub, repo tools, whatever MCP the Project connected | Gmail + Calendar required; Slack / Notion / Linear / GitHub optional |
+| Hands | GitHub, repo tools, whatever MCP the Project connected | Calendar required; Gmail when this OS owns mail; Slack / X / Notion / Linear / GitHub optional |
 | Writes that leave the machine | Human approval for pushes, PRs, external posts | Approval protocol in `CLAUDE.md` §4 for send / RSVP / invite / archive |
 | Ranking | The assignment you were given | `goals.yaml` only |
 

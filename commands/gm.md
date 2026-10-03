@@ -10,8 +10,9 @@ argument-hint: "[optional: a date, or 'short', or a focus area like 'public-buil
 The first command of the day. Read-only synthesis of what happened since yesterday and what
 happens today, ranked by `goals.yaml`, ending in exactly one question: what to do first.
 
-This command **never sends anything** and **never creates calendar events**. It may write a
-single archive file under `briefings/`.
+This command **never sends anything** and **never creates calendar events**. It **never scans
+X** and **never re-triages a channel `inbound` marks `external`**. It may write a single
+archive file under `briefings/`.
 
 If it does not fit on one screen, you have not prioritized.
 
@@ -42,9 +43,19 @@ If it does not fit on one screen, you have not prioritized.
    calendar MCP is unavailable, print the agenda section as "Calendar unavailable — no agenda"
    and continue.
 
-4. **Read the inbox** for the window. Do not read message bodies in bulk; read senders, subjects,
-   and threads, then open only the ones that look Tier 1 or Tier 2. If the Gmail MCP is
-   unavailable, print "Inbox unavailable" and continue.
+4. **Decide inbound** from `schedules.yaml` using CLAUDE.md §11. Missing `inbound` block:
+   treat email as `cos` and X as `none`.
+   - **Email `cos`:** Read the inbox for the window. Do not read message bodies in bulk; read
+     senders, subjects, and threads, then open only the ones that look Tier 1 or Tier 2. If
+     the Gmail MCP is unavailable, print "Inbox unavailable" and continue.
+   - **Email `external` or `none`:** Do not call Gmail. Print
+     `Inbox: owned by <handler> — skipped` (or `Inbox: unused`) as one line under Friction,
+     then continue. Do not invent mail you did not read.
+   - **X:** Do not search, do not pull a timeline, do not paginate, do not check credits.
+     Call X only when `inbound.x.owner` is `on-demand` **and** a named `contacts/` person or
+     an `x.com/status` / `x.com/i/article` link is already in today's calendar, tasks,
+     `$ARGUMENTS`, or an open dispatch — then one post or one user lookup. Otherwise say
+     nothing about X.
 
 5. **Score everything** against `goals.yaml` using the priority model in CLAUDE.md §6 and the
    tiers in §8. Every item you surface must name its goal. Items matching no goal are
@@ -100,6 +111,7 @@ If it does not fit on one screen, you have not prioritized.
    - <Name> (<tier>, <N>d) — hook: <specific reason to reach out>
 
    ### Friction
+   - Inbox: owned by Grok bot — skipped
    - <collision, overload, or missing recurring commitment>
 
    ### Unaligned
@@ -122,6 +134,8 @@ If it does not fit on one screen, you have not prioritized.
 - Read-only except for `briefings/`.
 - Never send, reply, RSVP, or create an event, even if an item obviously needs one. Recommend it.
 - Never summarize an email you did not open. "3 unread from Jordan" is honest; a summary of
-  their contents is not.
+  their contents is not. If email is `external`, you did not open anything — do not guess
+  what Grok already triaged.
+- Never call X from this command unless the on-demand gate in step 4 fires.
 - Never surface more than five Tier 1 items. If there are more, the tiering is wrong — re-rank
   by goal priority and say the count you suppressed.

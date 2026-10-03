@@ -23,7 +23,7 @@ $ cursor .          # or: claude
 | `CLAUDE.md` | **The OS.** Identity, voice, hard constraints, modes, MCP inventory. Loaded every session. |
 | `goals.yaml` | **Prioritization truth.** Nothing — not urgency, not seniority — outranks it. |
 | `my-tasks.yaml` | Open commitments, each tied to a goal, each with a physical next action. |
-| `schedules.yaml` | Working hours, protected blocks, recurring commitments, scheduling defaults. |
+| `schedules.yaml` | Working hours, protected blocks, inbound ownership, scheduling defaults. |
 | `contacts/` | A dated, append-only markdown CRM. One file per person. Tiers drive outreach cadence. |
 | `work-log/` | Assignments: owner, done-when, out-of-scope, status location. Written by `/dispatch`. |
 | `commands/` | Executable playbooks: `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`. |
@@ -147,10 +147,12 @@ will never overwrite one for you, precisely because it cannot tell your edits fr
    TPM operator (public build, deep work, weekly status) — they make the format obvious and are
    useless to you. Five to seven goals, each with a `why` that names the consequence of failure
    — triage quality comes directly from that field.
-2. **Connect Gmail and Google Calendar.** See [`docs/mcp-servers.md`](docs/mcp-servers.md). These
-   are the minimum; everything else is optional and degrades cleanly.
+2. **Connect Google Calendar.** See [`docs/mcp-servers.md`](docs/mcp-servers.md). Connect
+   Gmail only if this OS should triage mail (`inbound.email.owner: cos`). The shipped file
+   sets email to `external` (Grok bot) and X to `on-demand` so `/gm` does not double-triage
+   or spend credits on a scan.
 3. **Set your protected time** in `schedules.yaml`. If deep work is not in here, it will get
-   scheduled over.
+   scheduled over. Confirm `inbound` matches who actually reads mail, chat, and X.
 4. **Delete the example contact** and add three real ones — the people you most regret losing
    touch with.
 5. **Run `/gm`.**
@@ -178,10 +180,11 @@ also wires user-level slash commands.
    `@`'s `CLAUDE.md`. After install, the filled copy at `~/.claude/chief-of-staff/CLAUDE.md`
    wins over the unsubstituted repo file.
 
-3. **Pin Gmail and Calendar.** Copy [`.cursor/mcp.json.example`](.cursor/mcp.json.example) to
-   `~/.cursor/mcp.json` (every project) or `.cursor/mcp.json` (just this one). The example
-   uses real packages: `@klodr/gmail-mcp` and `@cocal/google-calendar-mcp`. Authenticate with
-   draft-only Gmail scopes — [`docs/mcp-servers.md`](docs/mcp-servers.md). Do not commit the
+3. **Pin Calendar (and Gmail only if this OS owns mail).** Copy
+   [`.cursor/mcp.json.example`](.cursor/mcp.json.example) to `~/.cursor/mcp.json` (every
+   project) or `.cursor/mcp.json` (just this one). The example uses real packages:
+   `@klodr/gmail-mcp` and `@cocal/google-calendar-mcp`. If you do connect Gmail, authenticate
+   with draft-only scopes — [`docs/mcp-servers.md`](docs/mcp-servers.md). Do not commit the
    filled file.
 
 4. **Reload so pstack is live.** `.cursor/settings.json` already enables the

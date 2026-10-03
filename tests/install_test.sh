@@ -168,6 +168,21 @@ grep -qF 'pstack unavailable — owner runs without a named playbook' \
     "$H1/.cursor/commands/dispatch.md" \
   && pass "Cursor /dispatch keeps pstack degradation" \
   || fail "Cursor /dispatch dropped pstack degradation"
+grep -qE '^  email:$' "$COS/schedules.yaml" \
+  && grep -qE '^    owner: external$' "$COS/schedules.yaml" \
+  && grep -qF 'handler: "Grok bot"' "$COS/schedules.yaml" \
+  && pass "installed schedules.yaml names Grok as email owner" \
+  || fail "installed schedules.yaml lost inbound email ownership"
+grep -qF 'owner: on-demand' "$COS/schedules.yaml" \
+  && pass "installed schedules.yaml keeps X on-demand" \
+  || fail "installed schedules.yaml lost inbound X ownership"
+grep -qF 'never scans' "$H1/.claude/commands/gm.md" \
+  && grep -qF 'Email `external` or `none`' "$H1/.claude/commands/gm.md" \
+  && pass "/gm skips external inbox and does not scan X" \
+  || fail "/gm is missing inbound skip rules"
+grep -qF 'Pass inbox to override' "$H1/.claude/commands/triage.md" \
+  && pass "/triage empty run does not re-triage external mail" \
+  || fail "/triage is missing the external-mail stop line"
 if grep -qF '"pstack"' "$REPO_DIR/.cursor/settings.json" \
    && grep -qF '"enabled": true' "$REPO_DIR/.cursor/settings.json"; then
   pass "repo enables pstack in .cursor/settings.json"

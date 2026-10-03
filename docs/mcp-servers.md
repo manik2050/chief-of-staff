@@ -1,19 +1,23 @@
 # MCP servers
 
-The Chief of Staff is only as good as what it can see. **Gmail and Google Calendar are the
-minimum viable set** — without them `/gm` degrades into a task-file reader and `/triage` has
-nothing to triage.
+The Chief of Staff is only as good as what it can see. **Google Calendar is required.**
+**Gmail is required when this OS owns email** (`inbound.email.owner: cos` in
+`schedules.yaml`). If another bot already triages Gmail, set that owner to `external` and
+`/gm` will skip the inbox on purpose.
 
-Everything else is optional. The OS is written to degrade gracefully: a missing server produces
-a one-line note in the output, never a silent gap. See CLAUDE.md §11 for the per-server
-fallbacks.
+X is optional and billed. Do not connect it for a daily scan. CLAUDE.md §11 is the rule:
+named post or named contact, never a briefing sweep.
+
+Everything else is optional. The OS is written to degrade gracefully: a missing server
+produces a one-line note in the output, never a silent gap. See CLAUDE.md §11 for the
+per-server fallbacks.
 
 ## The minimum set
 
 | Server | Why it is required | Scopes it needs | Used by |
 | --- | --- | --- | --- |
-| **Gmail** | Reading the inbox is what makes triage possible. Drafting replies is the main output. | read messages and threads; create drafts. Send scope is optional — see below. | `/gm`, `/triage`, `/enrich` |
 | **Google Calendar** | You cannot propose a slot you have not verified. This is a hard constraint, not a nicety. | read events (freebusy plus event details); create events only if you want the agent to book. | `/gm`, `/my-tasks`, scheduling mode |
+| **Gmail** | Only when `inbound.email.owner` is `cos`. Reading the inbox is what makes CoS triage possible. Drafting replies is the main output. Skip entirely when another bot owns mail. | read messages and threads; create drafts. Send scope is optional — see below. | `/gm` (owned mail), `/triage inbox`, `/enrich` (owned mail) |
 
 ### A note on send scope
 
@@ -32,6 +36,7 @@ if you decide you want to.
 | Web search / fetch | Contact enrichment: role changes, funding, news | `/enrich` reports "no external check" |
 | Task tracker (Linear, Jira, Asana) | Two-way sync with `my-tasks.yaml` | `my-tasks.yaml` stands alone, which is fine |
 | GitHub | Optional follow-on for `/dispatch` (draft an issue or PR) | Assignment stays a file; `/dispatch` prints "GitHub unavailable" |
+| X | A named post or a named `contacts/` person. Credits are spent per lookup. | Do not scan. `/gm` says nothing about X. |
 | Filesystem | Explicit access to the install root if your client sandboxes it | Usually built in |
 
 ## Installing
@@ -115,17 +120,24 @@ and calendar read (plus free/busy) before any create-event scope.
 
 ## Verifying it works
 
-1. `claude mcp list` (or Cursor's MCP settings) shows both servers connected.
+1. `claude mcp list` (or Cursor's MCP settings) shows Calendar connected, and Gmail
+   connected if this OS owns email.
 2. Ask: *"What is on my calendar tomorrow?"* — you should get real events, not an apology.
-3. Ask: *"How many unread emails arrived since yesterday?"* — a count, not a guess.
-4. Run `/gm`. The Agenda and Tier sections should both have content.
+3. Ask: *"How many unread emails arrived since yesterday?"* — a count, not a guess. Skip this
+   check if `inbound.email.owner` is `external`.
+4. Run `/gm`. The Agenda section should have content. The inbox line should either list
+   mail this OS owns, or print `Inbox: owned by <handler> — skipped`.
 
 If step 4 prints "Calendar unavailable" or "Inbox unavailable", the OS is working correctly and
-the server is not connected — that message is the designed failure mode.
+the server is not connected — that message is the designed failure mode. If it prints
+`Inbox: owned by Grok bot — skipped`, that is also designed: do not connect Gmail just to
+double-triage.
 
 ## What the agent may and may not do with these
 
-Read tools are called freely. Write tools — `send`, `reply`, `create_event`, `post_message` —
-require the approval protocol in CLAUDE.md §4 every single time. Approval of a plan is never
-approval of a specific message. If you ever see a message go out without you having typed an
-explicit yes, that is a bug in the OS, not a feature of the model.
+Calendar, Gmail, Slack, and filesystem reads are called freely when this OS owns the
+channel. X reads spend credits — do not call X from `/gm` or default `/triage`. Write tools
+— `send`, `reply`, `create_event`, `post_message` — require the approval protocol in
+CLAUDE.md §4 every single time. Approval of a plan is never approval of a specific message.
+If you ever see a message go out without you having typed an explicit yes, that is a bug in
+the OS, not a feature of the model.
