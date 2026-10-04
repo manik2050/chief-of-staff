@@ -12,7 +12,7 @@ an oversight or a decision.
 
 - `CLAUDE.md` as the OS: identity, voice, hard constraints, modes, MCP inventory
 - `goals.yaml` as prioritization truth, with `my-tasks.yaml` and `schedules.yaml` alongside it
-- `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`
+- `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`, `/process`, `/ask`
 - `contacts/` as a dated, append-only markdown CRM
 - `work-log/` as file-native assignments to humans and agent roles
 - `vault/` as the PARA knowledge tree; `core/paths.py` resolves a kit checkout when
@@ -29,9 +29,9 @@ These items are dispatched, not invented ad hoc. `/dispatch public-build <item>`
 assignment; pstack runs the named playbook (`docs/pstack.md`). One item per dispatch. Do not
 start all four because the plugin is on.
 
-**Vault commands.** The folders and the OS rules ship. Inbox processing and note-only Q&A
-are still playbooks to write (`/process`, `/ask`). Do not invent a second CRM or a second
-`goals.yaml` inside those commands.
+**Vault `/review` and `/decide`.** Inbox filing and note-only Q&A ship as `/process` and
+`/ask`. A Sunday resurfacing pass and a decision memo are still later. Do not fold them into
+`/my-tasks`.
 First dispatch: `implement` / `feature`. One command per PR.
 
 **Python MCP servers.** Some things the OS wants — cadence computation across the whole CRM,

@@ -14,7 +14,7 @@ CLAUDE.md          the OS — identity, voice, constraints, modes, MCP inventory
 goals.yaml         prioritization truth (shipped as a worked example)
 my-tasks.yaml      open commitments (worked example)
 schedules.yaml     rhythms and protected time (worked example)
-commands/*.md      slash-command playbooks, one per command
+commands/*.md      slash-command playbooks, including /process and /ask for the vault
 contacts/          CRM: README (schema), _template.md, one worked example
 work-log/          assignments: README, _template.md; /dispatch writes the rest
 vault/             PARA knowledge tree: README, _template.md, empty folders
