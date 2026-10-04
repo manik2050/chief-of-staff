@@ -125,8 +125,12 @@ check_file "$H1/.claude/commands/triage.md"
 check_file "$H1/.claude/commands/my-tasks.md"
 check_file "$H1/.claude/commands/enrich.md"
 check_file "$H1/.claude/commands/dispatch.md"
+check_file "$H1/.claude/commands/process.md"
+check_file "$H1/.claude/commands/ask.md"
 check_file "$H1/.cursor/commands/gm.md"
 check_file "$H1/.cursor/commands/dispatch.md"
+check_file "$H1/.cursor/commands/process.md"
+check_file "$H1/.cursor/commands/ask.md"
 check_file "$H1/.claude/CLAUDE.md"
 
 grep -q '^tier: balanced$' "$COS/work-log/_template.md" \

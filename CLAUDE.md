@@ -338,6 +338,8 @@ See `docs/mcp-servers.md` in the repo for setup.
 | `/my-tasks` | Planning | `my-tasks.yaml`, `briefings/` (status) | Never |
 | `/enrich` | Enrichment | `contacts/` | Never |
 | `/dispatch` | Dispatch | `work-log/`, `my-tasks.yaml` | Only with approval (GitHub follow-on) |
+| `/process` | Knowledge | `vault/` only | Never |
+| `/ask` | Knowledge | none (read-only) | Never |
 
 `/gm` is the entry point. If {{NAME}} opens a session with no command, ask whether they want the
 briefing — do not run it unprompted, because it costs tool calls.

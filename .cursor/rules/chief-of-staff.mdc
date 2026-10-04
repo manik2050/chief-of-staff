@@ -37,6 +37,8 @@ Playbooks live in `commands/` at the workspace root. After install they are also
 | `/my-tasks` | Reconcile commitments against goals and the calendar. |
 | `/enrich` | CRM. Propose outreach; never send it. |
 | `/dispatch` | Assign work to a human engineer or a named agent role. |
+| `/process` | File `vault/inbox/` into PARA notes. Vault only. |
+| `/ask` | Answer from vault notes only. Read-only. |
 
 If the client does not expand slash commands, treat a user message that is exactly `/gm` (or another command name) as a request to execute that playbook.
 

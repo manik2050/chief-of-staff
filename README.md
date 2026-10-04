@@ -27,7 +27,7 @@ $ cursor .          # or: claude
 | `contacts/` | A dated, append-only markdown CRM. One file per person. Tiers drive outreach cadence. |
 | `work-log/` | Assignments: owner, done-when, out-of-scope, status location. Written by `/dispatch`. |
 | `vault/` | PARA knowledge tree. Capture in `inbox/`. Priority and people stay in YAML and `contacts/`. |
-| `commands/` | Executable playbooks: `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`. |
+| `commands/` | Playbooks: `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`, `/process`, `/ask`. |
 | `core/paths.py` | One path contract for everything, plus a generated `paths.json`. |
 | `install.sh` | Idempotent, non-destructive install into `~/.claude/` and `~/.cursor/commands/`. |
 
@@ -53,6 +53,12 @@ relationships, and refuses to propose outreach without a specific reason to reac
 `review`), an execution tier (`cost` / `balanced` / `intelligence`), explicit approval gates,
 done-when, out-of-scope, and where status goes. File-native. GitHub is optional and still needs
 a yes.
+
+**`/process`** — files up to 20 `vault/inbox/` captures into PARA notes. Keeps the operator's
+words. Never writes the YAML ledgers or `contacts/`.
+
+**`/ask`** — answers a question from filed vault notes only, with `[[wikilink]]` citations.
+If the notes do not cover it, it says so and stops.
 
 ## It will not send anything without you
 
@@ -102,6 +108,7 @@ Preview without writing anything:
 ├── CLAUDE.md                      # created only if absent; imports the OS below
 ├── commands/
 │   ├── gm.md  triage.md  my-tasks.md  enrich.md  dispatch.md
+│   ├── process.md  ask.md
 └── chief-of-staff/                # the install root
     ├── CLAUDE.md                  # the OS
     ├── goals.yaml  my-tasks.yaml  schedules.yaml
@@ -198,7 +205,8 @@ also wires user-level slash commands.
 5. **Rewrite `goals.yaml`** in the install root. Then type `/gm`.
 
    If slash commands are not listed yet, send the message `/gm`. The rule treats that as
-   "run `commands/gm.md`". Same for `/triage`, `/my-tasks`, `/enrich`, `/dispatch`.
+   "run `commands/gm.md`". Same for `/triage`, `/my-tasks`, `/enrich`, `/dispatch`,
+   `/process`, `/ask`.
 
 How a Cursor Project coordinator differs from this CoS persona:
 [`docs/cursor-projects.md`](docs/cursor-projects.md).
@@ -214,9 +222,9 @@ How a Cursor Project coordinator differs from this CoS persona:
 
 ## Roadmap
 
-The PARA vault folders ship. Inbox processing and note-only Q&A playbooks, local Python MCP
-servers, and `SKILL.md` packaging are still later. The installer test now runs on every pull
-request and on `main`; remaining CI gates wait until the file formats settle.
+`/review` and `/decide` for the vault, local Python MCP servers, and `SKILL.md` packaging
+are still later. The installer test now runs on every pull request and on `main`; remaining
+CI gates wait until the file formats settle.
 [`docs/roadmap.md`](docs/roadmap.md) says what is missing and why. Execute them as
 `/dispatch public-build ...` assignments through pstack, one item per PR — not as a
 side quest inside an unrelated change.
