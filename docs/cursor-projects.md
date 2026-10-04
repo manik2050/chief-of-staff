@@ -26,6 +26,7 @@ Do not collapse the two. A coordinator that starts sending email has left its jo
 | A relationship | `contacts/<slug>.md` | A CRM SaaS |
 | An assignment to a human or an agent role | `work-log/YYYY-MM-DD-<slug>.md` | A verbal "can you look at this" |
 | A morning briefing archive | `briefings/YYYY-MM-DD.md` | Slack |
+| A captured idea or research note | `vault/inbox/` then a PARA folder | `goals.yaml`, `contacts/`, a Project `notes.md` |
 | Contributor conventions for this repo | `AGENTS.md` | `CLAUDE.md` |
 | Cross-agent status for a Cursor Project | that Project's `notes.md` | `goals.yaml` |
 

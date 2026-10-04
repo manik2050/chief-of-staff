@@ -15,6 +15,8 @@ an oversight or a decision.
 - `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`
 - `contacts/` as a dated, append-only markdown CRM
 - `work-log/` as file-native assignments to humans and agent roles
+- `vault/` as the PARA knowledge tree; `core/paths.py` resolves a kit checkout when
+  `$COS_HOME` is unset so a cloud agent and a local install share the same folder names
 - Cursor project rule, `.cursor/mcp.json.example`, `.cursor/settings.json` (pstack on),
   `docs/cursor-projects.md`, `docs/pstack.md`
 - `core/paths.py` — a single path contract, plus a generated `paths.json`
@@ -27,11 +29,10 @@ These items are dispatched, not invented ad hoc. `/dispatch public-build <item>`
 assignment; pstack runs the named playbook (`docs/pstack.md`). One item per dispatch. Do not
 start all four because the plugin is on.
 
-**PARA vault.** State currently lives as a flat set of files under the install root. A
-Projects / Areas / Resources / Archive vault gives commands a place to put research, meeting
-notes, and long-lived reference material without every command inventing its own layout.
-`core/paths.py` already reserves `vault/` for this, so nothing will need to move.
-First dispatch: `explore` / `investigation`. Then `implement` / `feature`.
+**Vault commands.** The folders and the OS rules ship. Inbox processing and note-only Q&A
+are still playbooks to write (`/process`, `/ask`). Do not invent a second CRM or a second
+`goals.yaml` inside those commands.
+First dispatch: `implement` / `feature`. One command per PR.
 
 **Python MCP servers.** Some things the OS wants — cadence computation across the whole CRM,
 capacity math against the calendar, task staleness sweeps — are deterministic and should not be
