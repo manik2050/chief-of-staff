@@ -43,11 +43,27 @@ class Paths:
     DEFAULT_COS_DIRNAME = "chief-of-staff"
 
     # Directories install.sh and the agent may create. Everything else must already exist.
-    MANAGED_DIRS = ("contacts", "briefings", "drafts", "work-log")
+    MANAGED_DIRS = ("contacts", "briefings", "drafts", "work-log", "vault")
 
-    # Reserved for later phases (PARA vault, Python MCP servers, shared skills). Declared now
-    # so the contract is stable. Not created by install.sh.
-    RESERVED = ("vault", "mcp", "skills")
+    # PARA layout under vault/. Created by ensure() and install.sh. Cloud checkouts keep the
+    # same names so a Cursor agent and a local install read one contract.
+    VAULT_SUBDIRS = (
+        "inbox",
+        "projects",
+        "areas",
+        "resources",
+        "archive",
+        "daily",
+        "outputs",
+        "outputs/writing",
+        "outputs/decisions",
+        "outputs/reviews",
+        "maps",
+    )
+
+    # Reserved for later phases (Python MCP servers, shared skills). Declared now so the
+    # contract is stable. Not created by install.sh.
+    RESERVED = ("mcp", "skills")
 
     @staticmethod
     def canonical(path: str | os.PathLike[str]) -> Path:
@@ -69,13 +85,36 @@ class Paths:
         return Paths.canonical(Path.home() / Paths.DEFAULT_CLAUDE_DIRNAME)
 
     @staticmethod
+    def checkout_root(start: str | os.PathLike[str] | None = None) -> Path | None:
+        """A kit checkout used as the live OS (Cursor cloud, or this repo opened as the workspace).
+
+        True when a directory on the walk from `start` (default: cwd) contains both `CLAUDE.md`
+        and `core/paths.py`. That pair is the kit, not a random notes folder.
+        """
+        here = Paths.canonical(start or Path.cwd())
+        for candidate in (here, *here.parents):
+            if (candidate / "CLAUDE.md").is_file() and (candidate / "core" / "paths.py").is_file():
+                return candidate
+        return None
+
+    @staticmethod
     def root(explicit: str | os.PathLike[str] | None = None) -> Path:
-        """The Chief of Staff install root, holding all state for one operator."""
+        """The Chief of Staff install root, holding all state for one operator.
+
+        Resolution order:
+            1. `--root` / the explicit argument
+            2. `$COS_HOME` when set and non-empty
+            3. The nearest kit checkout (cloud agents and a repo opened in Cursor)
+            4. `$CLAUDE_HOME/chief-of-staff` (a local install)
+        """
         if explicit:
             return Paths.canonical(explicit)
         override = os.environ.get("COS_HOME")
         if override:
             return Paths.canonical(override)
+        found = Paths.checkout_root()
+        if found:
+            return found
         return Paths.canonical(Paths.claude_home() / Paths.DEFAULT_COS_DIRNAME)
 
     @staticmethod
@@ -118,6 +157,18 @@ class Paths:
         return (root or Paths.root()) / "work-log"
 
     @staticmethod
+    def vault_dir(root: Path | None = None) -> Path:
+        """Personal knowledge tree. Inbox, PARA folders, daily notes, and outputs."""
+        return (root or Paths.root()) / "vault"
+
+    @staticmethod
+    def vault_map(root: Path | None = None) -> dict[str, str]:
+        """Named vault folders for paths.json. One idea notes live under these paths."""
+        base = Paths.vault_dir(root)
+        names = ("inbox", "projects", "areas", "resources", "archive", "daily", "outputs", "maps")
+        return {name: str(base / name) for name in names}
+
+    @staticmethod
     def manifest(root: Path | None = None) -> Path:
         """Where the generated contract is written."""
         return (root or Paths.root()) / "paths.json"
@@ -149,7 +200,9 @@ class Paths:
                 "briefings": str(Paths.briefings_dir(base)),
                 "drafts": str(Paths.drafts_dir(base)),
                 "work_log": str(Paths.work_log_dir(base)),
+                "vault": str(Paths.vault_dir(base)),
             },
+            "vault": Paths.vault_map(base),
             "reserved": Paths.reserved(base),
         }
 
@@ -160,6 +213,9 @@ class Paths:
         base.mkdir(parents=True, exist_ok=True)
         for name in Paths.MANAGED_DIRS:
             (base / name).mkdir(parents=True, exist_ok=True)
+        vault = Paths.vault_dir(base)
+        for name in Paths.VAULT_SUBDIRS:
+            (vault / name).mkdir(parents=True, exist_ok=True)
         return base
 
     @staticmethod

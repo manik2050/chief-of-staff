@@ -26,6 +26,7 @@ $ cursor .          # or: claude
 | `schedules.yaml` | Working hours, protected blocks, inbound ownership, scheduling defaults. |
 | `contacts/` | A dated, append-only markdown CRM. One file per person. Tiers drive outreach cadence. |
 | `work-log/` | Assignments: owner, done-when, out-of-scope, status location. Written by `/dispatch`. |
+| `vault/` | PARA knowledge tree. Capture in `inbox/`. Priority and people stay in YAML and `contacts/`. |
 | `commands/` | Executable playbooks: `/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch`. |
 | `core/paths.py` | One path contract for everything, plus a generated `paths.json`. |
 | `install.sh` | Idempotent, non-destructive install into `~/.claude/` and `~/.cursor/commands/`. |
@@ -107,6 +108,7 @@ Preview without writing anything:
     ├── paths.json                 # generated
     ├── contacts/                  # _template.md + a worked example
     ├── work-log/                  # _template.md + README; /dispatch writes here
+    ├── vault/                     # inbox + PARA folders; knowledge only
     ├── briefings/  drafts/        # written by the agent
     ├── templates/weekly-status.md
     ├── core/paths.py
@@ -212,8 +214,8 @@ How a Cursor Project coordinator differs from this CoS persona:
 
 ## Roadmap
 
-A PARA vault, local Python MCP servers for the deterministic work, and `SKILL.md` packaging
-are planned but deliberately not in this release. The installer test now runs on every pull
+The PARA vault folders ship. Inbox processing and note-only Q&A playbooks, local Python MCP
+servers, and `SKILL.md` packaging are still later. The installer test now runs on every pull
 request and on `main`; remaining CI gates wait until the file formats settle.
 [`docs/roadmap.md`](docs/roadmap.md) says what is missing and why. Execute them as
 `/dispatch public-build ...` assignments through pstack, one item per PR — not as a
