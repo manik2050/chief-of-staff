@@ -18,13 +18,12 @@ endpoint, keep the list honest.
      |
      v
 +-----------+                      +-----------+
-| web tier  | --- lookup "feed" -->|  registry |
-| terminate | <--- healthy addrs --+ Consul /  |
-| HTTP      |                      | etcd / zk |
-+-----------+                      +-----------+
-     |                                   ^
-     | call one healthy instance         | register + /health
-     v                                   |
+| web layer | --- lookup "feed" -->|  registry |
+|  servers  | <--- healthy addrs --+ Consul /  |
++-----------+                      | etcd / zk |
+     |                             +-----------+
+     |  HTTP to a live app               ^
+     v                                   | register + /health
 +-----------+   +-----------+       +-----------+
 |  profile  |   |   feed    |       |  workers  |
 +-----------+   +-----------+       +-----------+
