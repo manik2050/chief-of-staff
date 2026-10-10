@@ -38,6 +38,27 @@ defaults.
 If `/poteto-mode` still does not resolve, print "pstack unavailable" and keep going. The
 assignment is still valid. The owner just has no named playbook.
 
+## First run
+
+pstack is already on for this folder. Reload Cursor if `/poteto-mode` is missing from `/`.
+
+1. On the machine that will run agents, type `/setup-pstack` and pick a budget. `large`
+   matches the plugin defaults. That writes `~/.cursor/rules/pstack-models.mdc`. Do not
+   commit it.
+2. Start a new chat so the model rule loads.
+3. For engineering work, type `/poteto-mode` plus the goal and a check that can pass or fail.
+   Example: `/poteto-mode add a --json flag to this command. text output stays
+   byte-identical. verify both.`
+4. Watch the todo list. Its first items are the playbook steps. A skipped step stays with
+   `skip: <reason>`.
+5. Prove installer changes with `.cursor/skills/verify-cos` or `./tests/install_test.sh`.
+6. Open a PR if that is the done-when. Do not merge it. Do not run autopilot-full.
+
+To keep `/poteto-mode` on for the whole chat, pick it from `/` with Option+Enter (Mac) or
+Alt+Enter (Windows). Plain Enter attaches it to one message.
+
+Do not use pstack for `/gm` or `/triage`. Those stay CoS modes.
+
 ## First command
 
 For any non-trivial engineering task:
@@ -82,8 +103,9 @@ the CoS constraints in a form a worker can obey without loading the whole OS.
 5. Do not create repos, dump vendor trees, or stand up a hosted service.
 6. No secrets in files. Example addresses stay on `example.com`.
 7. Status appends under `## Status` on the assignment. Do not rewrite the request.
-8. Prove it on the real artifact. For this kit that means `./tests/install_test.sh` (and
-   `./install.sh --dry-run` when the installer changed). Compiling is not proof.
+8. Prove it on the real artifact. Read `.cursor/skills/verify-cos/SKILL.md` and drive the
+   matching feature, or run `./tests/install_test.sh`. Compiling is not proof. Never run
+   `install.sh` against the operator's real home from a verification drive.
 9. One concern per PR. An installer change and a new command are two PRs.
 
 ## How to execute the roadmap
