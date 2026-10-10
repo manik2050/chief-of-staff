@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
-#
-# Isolated HOME drives of install.sh. Never points at the operator's real home.
-#
-#   ./.cursor/skills/verify-cos/verify-cos.sh doctor
-#   ./.cursor/skills/verify-cos/verify-cos.sh drive dry-run
-#   ./.cursor/skills/verify-cos/verify-cos.sh suite
-#   ./.cursor/skills/verify-cos/verify-cos.sh cleanup
-#
-# Evidence stays under artifacts/<run-id>/. Scratch homes are listed in homes.txt.
+# Isolated HOME drives of install.sh. Scratch homes are listed in homes.txt.
 
 set -euo pipefail
 
