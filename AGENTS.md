@@ -97,7 +97,9 @@ this must work on a fresh machine with nothing installed.
 
 ```bash
 ./tests/install_test.sh          # fresh install, re-install, non-destructiveness, placeholders
-./install.sh --dry-run           # eyeball what a real run would do
+./.cursor/skills/verify-cos/verify-cos.sh doctor
+./.cursor/skills/verify-cos/verify-cos.sh drive dry-run
+./install.sh --dry-run           # eyeball what a real run would do; use verify-cos for proof
 python3 core/paths.py --json     # inspect the path contract
 shellcheck install.sh tests/*.sh # if you have it
 ```
@@ -117,6 +119,7 @@ It asserts:
   degrades to `execution: null` when pstack is off
 - `.github/workflows/install-test.yml` exists and invokes `./tests/install_test.sh`
 - `docs/build-log/` stays in the repo and is not copied into the install root
+- `.cursor/skills/verify-cos/` stays in the repo and is not copied into the install root
 
 Add a case to it for anything you change in `install.sh`.
 
