@@ -95,7 +95,7 @@ Recommended first cut, each as its own `/dispatch public-build ...` (the shipped
 
 | Later item | First owner | `execution` | Why this cut |
 | --- | --- | --- | --- |
-| PARA vault | `explore` | `investigation` | `core/paths.py` already reserves `vault/`. Confirm the contract and the command writers before anyone creates folders. Follow with `implement` / `feature`. |
+| Vault commands (`/process`, `/ask`) | `implement` | `feature` | Folders and OS rules already live under `vault/`. One command per PR. Do not write YAML ledgers from a vault pass. |
 | Python MCP servers | `implement` | `feature` | After `/architect` on the tool surface. Servers live under reserved `mcp/` and read `paths.json`. One server per PR. |
 | `SKILL.md` packaging | `implement` | `authoring-a-skill` | Extract a shared piece (tiering, cadence, drafting voice) into `skills/` without restating CLAUDE.md. One skill per PR. |
 | CI and lifecycle gates | `implement` | `feature` | First cut is the GitHub Action that runs `tests/install_test.sh` on PRs and `main`. Next: schema validation or the playbook-shape lint. Add a case; do not weaken the suite. Use `/tdd` when the check is cheap. |
