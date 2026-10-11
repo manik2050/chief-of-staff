@@ -189,9 +189,11 @@ also wires user-level slash commands.
 
 4. **Reload so pstack is live.** `.cursor/settings.json` already enables the
    [pstack](https://cursor.com/marketplace/cursor/pstack) plugin for this folder. Run
-   `/setup-pstack` once on the machine to pick models. `/dispatch` names the playbook; the
-   owner runs `/poteto-mode` (or `/interrogate` for review). CLAUDE.md §4 still wins if a
-   playbook would send or merge. Details: [`docs/pstack.md`](docs/pstack.md).
+   `/setup-pstack` once on the machine to pick models. Follow
+   [First run](docs/pstack.md#first-run). `/dispatch` names the playbook; the owner runs
+   `/poteto-mode` (or `/interrogate` for review). Prove installer work with
+   [verify-cos](.cursor/skills/verify-cos/SKILL.md). CLAUDE.md §4 still wins if a playbook
+   would send or merge. Details: [`docs/pstack.md`](docs/pstack.md).
 
 5. **Rewrite `goals.yaml`** in the install root. Then type `/gm`.
 
