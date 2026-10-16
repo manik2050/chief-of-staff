@@ -9,10 +9,10 @@ status. The academy's layers sit on that path: client, local network,
 DNS, intermediate hops (CDN, reverse proxy), then the server.
 
 ```
-  client --> DNS --> CDN / edge --> LB --> app --> origin (files / DB)
-    |         |          |           |      |         |
-  cache,    name->IP   hop in      pick   HTTP     data behind
-  4xx,      miss /     path        a live 5xx      the app
+  client --> DNS --> CDN / edge --> reverse proxy / LB --> app --> server (files)
+    |         |          |           |                      |         |
+  cache,    name->IP   hop in      pick                   HTTP
+  4xx,      miss /     path        a live                 5xx
   other     stale TTL  (VPN can    backend
   browser              reroute)
   other site
