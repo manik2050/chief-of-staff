@@ -26,10 +26,10 @@ DESIGN                            MEASURE
 ```
   request
      |
-     | rate-limit unused traffic          academy: align cost (II)
+     | rate-limit unnecessary traffic     academy: align cost (II)
      v
-+------------------+  CDN / cache hit     academy: CDN + object
-| edge / LB pool   | ------------------>  store; skip origin bill
++------------------+  CDN hit -> academy: compressed media in object store + CDN
+| app pool         |
 +------------------+
      | miss
      | autoscale chairs in / out          academy: scale with traffic
@@ -42,25 +42,24 @@ DESIGN                            MEASURE
      v
 +------------------+  archive inactive    academy: storage follows use
 | store            |  extra replicas      academy: paid trade-off
-+------------------+                      (read copies vs write path)
++------------------+                      (know the trade-off)
      |
   meters: utilization, spend, errors      Vogels IV
 ```
 
 ```
 # Vogels V: tunable blocks by criticality. no dollar amounts.
-def admit(component, busy):
+def admit(component, cost_pressure):
     if component.tier == 1:       # essential; keep serving
         return "serve"
     if component.tier == 2:       # important; may shrink
-        return "serve" if busy else "shrink"
-    return "off"                  # T3 nice-to-have
+        return "shrink" if cost_pressure else "serve"
+    return "cheap"  # T3 nice-to-have; low-cost, easily controlled
 ```
 
-Back-of-the-envelope arithmetic makes Law I checkable before you buy
-capacity: QPS and bytes, not a later surprise bill. A cache or CDN hit
-is a skipped origin trip (and bill). A load balancer in front of an
-autoscaling pool is how chairs appear and leave with traffic. Indexes
+Compressed media in object storage behind a CDN cut storage and streaming
+cost (academy). Autoscaling adds chairs when traffic rises and puts them
+away when it falls. Indexes
 and read replicas buy read speed; they are paid trade-offs, not free
 speed. Revisit production patterns (Law VI). Do not keep a language or
 store only because "we have always done it this way" (Law VII). Cheapen
