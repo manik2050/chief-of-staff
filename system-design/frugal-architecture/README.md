@@ -14,30 +14,20 @@ works. Frugality is maximizing value, not minimizing spend. If cost
 exceeds revenue, the system does not last.
 
 ```
-DESIGN                            MEASURE
- I  cost is an NFR                 IV  unobserved => unknown cost
- II architecture follows money     V   tunable controls by tier
- III every choice is a trade-off
-                                   OBSERVE
-                                   VI  optimize in small steps
-                                   VII success is not a proof
-```
-
-```
   request
      |
      | rate-limit unnecessary traffic     academy: align cost (II)
      v
-+------------------+  CDN hit -> academy: compressed media in object store + CDN
++------------------+  media -> object store + CDN (academy)
 | app pool         |
 +------------------+
-     | miss
+     |
      | autoscale chairs in / out          academy: scale with traffic
      v
 +------------------+
 | app blocks       |  T1 essential        Vogels V
 | T1 / T2 / T3     |  T2 may shrink
-+------------------+  T3 cheap or off
++------------------+  T3 cheap
      |
      v
 +------------------+  archive inactive    academy: storage follows use
@@ -62,7 +52,7 @@ cost (academy). Autoscaling adds chairs when traffic rises and puts them
 away when it falls. Indexes
 and read replicas buy read speed; they are paid trade-offs, not free
 speed. Revisit production patterns (Law VI). Do not keep a language or
-store only because "we have always done it this way" (Law VII). Cheapen
+store only because "We've always done it this way." (Law VII). Cheapen
 T3 before you starve T1.
 
 Sources: [systemdesign42/system-design-academy](https://github.com/systemdesign42/system-design-academy)
