@@ -8,7 +8,9 @@ private state, reads from its own mailbox, and handles one message at a
 time. Other actors never share that memory; they send. A supervisor
 watches the child and restarts it on failure. The academy's PayPal case:
 Akka (Java) took a billion daily transactions on 8 virtual machines
-after scale-out had meant more than 1000 VMs.
+after scale-out had meant more than 1000 VMs. Many actors can run at
+once; each still serializes its own mailbox (academy). Three messages
+in parallel need three actors.
 
 ```
   sender                         supervisor
@@ -21,11 +23,8 @@ after scale-out had meant more than 1000 VMs.
 +-----------+                       +----------+
 ```
 
-Many actors can run at once; each still serializes its own mailbox
-(academy). Three messages in parallel need three actors.
-
-```bash
-python3 - <<'PY'
+```python
+# Toy asyncio, not Akka. Run: python3 - <<'PY' ... PY
 import asyncio
 
 async def actor(name, mailbox):
@@ -48,43 +47,36 @@ async def main():
     await task
 
 asyncio.run(main())
-PY
-```
-
-```
-A start 1 n=1
-A done  1 n=1
-A start 2 n=2
-A done  2 n=2
-A start 3 n=3
-A done  3 n=3
+# A start 1 n=1
+# A done  1 n=1
+# A start 2 n=2
+# A done  2 n=2
+# A start 3 n=3
+# A done  3 n=3
 ```
 
 Start and done never interleave: one mailbox, one in-flight message, a
-private counter the senders cannot touch. Toy asyncio, not Akka.
-
-Hewitt, Bishop, and Steiger (1973) defined behavior as sending messages
-to actors and needed no semaphore primitive. Akka: an actor instance
-processes one message at a time, so no `synchronized` on that state;
-`tell` does not block the caller. Each Akka actor has a Mailbox where
-messages sit before they run. Erlang: each process has its own input
-queue; a supervisor starts, stops, and monitors children and restarts
-them when necessary (`one_for_one` restarts only the failed child).
-Akka typed default is stop on exception; wrap with `Behaviors.supervise`
-to restart.
-
+private counter the senders cannot touch. Hewitt, Bishop, and Steiger
+(1973) defined behavior as sending messages to actors and needed no
+semaphore primitive. Akka: an actor instance processes one message at a
+time, so no `synchronized` on that state; `tell` does not block the
+caller. Each Akka actor has a Mailbox where messages sit before they
+run. Erlang: each process has its own input queue; a supervisor starts,
+stops, and monitors children and restarts them when necessary
+(`one_for_one` restarts only the failed child). Akka typed default is
+stop on exception; wrap with `Behaviors.supervise` to restart.
 Tradeoffs: the academy says it is not a silver bullet — learning curve,
 and extra care against race conditions and deadlocks. Isolation removes
 shared-memory races on the actor's own state; it does not make every
 protocol race-free. An unbounded mailbox can grow until memory is gone
 (Akka: a bounded mailbox sends overflow to dead letters). Local state in
 the app server skips a cache or DB hop (academy); PayPal then routes a
-customer back to the same server with consistent hashing.
-
-Use it when many isolated units of work must run concurrently, when a
-parent should restart a failed child, or when a thread per request is
-the alternative. Skip it when a single-threaded path is enough: the
-learning curve is the cost, and the academy says scale is not automatic.
+customer back to the same server with consistent hashing. Use it when
+many isolated units of work must run concurrently, when a parent should
+restart a failed child, or when one thread per unit of work would cost
+too much (the academy says actors take fewer resources than threads).
+Skip it when a single-threaded path is enough: the learning curve is
+the cost, and the academy says it is not a silver bullet to scalability.
 
 Sources: [systemdesign42/system-design-academy](https://github.com/systemdesign42/system-design-academy)
 ([Actor Model](https://newsletter.systemdesign.one/p/actor-model)
