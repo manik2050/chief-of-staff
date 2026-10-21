@@ -17,6 +17,7 @@ schedules.yaml     rhythms and protected time (worked example)
 commands/*.md      slash-command playbooks, one per command
 contacts/          CRM: README (schema), _template.md, one worked example
 work-log/          assignments: README, _template.md; /dispatch writes the rest
+vault/             PARA knowledge tree: README, _template.md, empty folders
 templates/         weekly-status.md (used by /my-tasks status)
 core/paths.py      the path contract; nothing else may build paths
 docs/              mcp-servers.md, cursor-projects.md, pstack.md, roadmap.md,
@@ -105,7 +106,8 @@ shellcheck install.sh tests/*.sh # if you have it
 `tests/install_test.sh` runs everything inside a temporary `HOME` and touches nothing of yours.
 It asserts:
 
-- a fresh install creates the expected tree (including `work-log/`, Cursor command dir, `/dispatch`)
+- a fresh install creates the expected tree (including `work-log/`, `vault/`, Cursor command dir, `/dispatch`)
+- `paths.json` lists `vault` next to `work_log`, and a kit checkout is the root when `$COS_HOME` is unset
 - a second run creates nothing and leaves every file byte-identical
 - a pre-existing user file is never modified
 - no `{{PLACEHOLDER}}` survives into an installed file
