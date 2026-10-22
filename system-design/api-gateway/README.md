@@ -24,7 +24,7 @@ the client and takes non-business logic such as authorization.
 +--------------+  +--------------+
 | microservice |  | microservice |
 +--------------+  +--------------+
-     |
+     |                 |
      v
 API gateway: combine responses, cache if needed --> client
 ```
@@ -53,14 +53,15 @@ for client in ("maya", "bot", "eve"):
 # eve: rejected: not allowed
 ```
 
-Without the gateway, each client talks to each service and often gets the
-same payload on desktop and mobile: worse latency and bandwidth. The hop
+Without the gateway, each client talks to each service, and desktop and
+mobile get the same payload: worse latency and bandwidth. The gateway
 also terminates SSL so backends skip decrypt. Device type in HTTP headers
 can pick a different route; a backend-for-frontend is a separate gateway
 per device (desktop, mobile). A circuit breaker pauses repeated failing
-requests so unhealthy servers are not overloaded. The extra hop adds
-latency, cost, and ops work; it can become a bottleneck under high traffic,
-and a SPOF if set up incorrectly, so run more than one instance. Nginx,
+requests so unhealthy servers are not overloaded. The extra network hop
+adds latency; the gateway adds cost and ops work from maintenance; it can
+become a bottleneck under high traffic, and a SPOF if set up incorrectly,
+so run more than one instance. Nginx,
 Kong, and Tyk are common setups. Use a gateway when clients would otherwise
 call many public microservice URLs, or when rate limiting, authorization,
 and combining responses should sit off the business services. Skip it when
