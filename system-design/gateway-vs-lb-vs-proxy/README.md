@@ -7,8 +7,8 @@ A load balancer, an API gateway, and a reverse proxy all sit in front of
 servers and manage traffic. They overlap: each forwards a request and
 returns a response, and NGINX and HAProxy do both layer-7 reverse
 proxying and load balancing. They are not the same job. A load balancer
-spreads requests across servers that serve the same function and skips
-unhealthy ones. An API gateway is a single entry point: it throttles,
+spreads requests, often across servers that serve the same function, and
+skips unhealthy ones. An API gateway is a single entry point: it throttles,
 transforms, routes to microservices by URL path, headers, or query
 parameters, and combines their responses. A reverse proxy is useful even
 with one server: it hides the backend, terminates TLS, and caches
@@ -87,17 +87,17 @@ lines blur. Use a load balancer when several servers serve the same
 function. Use a reverse proxy for one public face, TLS termination,
 caching, or static content, even with one server. Use an API gateway
 when clients need one entry point to many microservices, with
-throttling, transforming, and combining in one place. Each hop adds
-operational work and can be a single point of failure without
-redundancy; the gateway's extra hop adds latency, and a load balancer or
-gateway can become a bottleneck if set up badly.
+throttling, transforming, and combining in one place. A load balancer or
+reverse proxy adds operational work and can be a single point of failure
+without redundancy; the gateway's extra hop adds latency, and a load
+balancer or gateway can become a bottleneck if set up badly.
 
 Sources: [systemdesign42/system-design-academy](https://github.com/systemdesign42/system-design-academy)
 ([API Gateway vs Load Balancer vs Reverse Proxy](https://newsletter.systemdesign.one/p/api-gateway-load-balancer-reverse-proxy)
 — LB distributes; gateway throttles, transforms, routes, combines;
 reverse proxy hides backends, TLS, cache; typical edge is load balancer,
 API gateway, reverse proxy, server, not the only setup; gateway extra hop
-latency, bottleneck, SPOF);
+latency and bottleneck; LB and reverse proxy operational cost and SPOF);
 [donnemartin/system-design-primer](https://github.com/donnemartin/system-design-primer)
 (Load balancer: skip unhealthy, L4 vs L7, bottleneck and SPOF;
 Reverse proxy: hide backends, SSL termination, cache, static content;
