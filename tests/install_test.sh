@@ -385,6 +385,17 @@ if [ -e "$COS/.github" ]; then
 else
   pass ".github is not installed (repo-only)"
 fi
+if [ -f "$REPO_DIR/.cursor/skills/verify-cos/SKILL.md" ] \
+   && [ -x "$REPO_DIR/.cursor/skills/verify-cos/verify-cos.sh" ]; then
+  pass "repo ships verify-cos for agents working on this tree"
+else
+  fail "missing .cursor/skills/verify-cos skill or helper"
+fi
+if [ -e "$COS/.cursor/skills" ] || [ -e "$COS/verify-cos" ]; then
+  fail "installer copied verify-cos into the install root"
+else
+  pass "verify-cos skill is not installed (repo-only)"
+fi
 
 # -------------------------------------------------------------------------------- summary
 printf '\n%s passed, %s failed\n' "$PASSED" "$FAILED"

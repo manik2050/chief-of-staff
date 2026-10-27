@@ -28,6 +28,8 @@ work-log/*.md
 # Test scratch
 tests/.tmp/
 .tmp/
+.cursor/skills/verify-cos/artifacts/*
+!.cursor/skills/verify-cos/artifacts/.gitignore
 
 __pycache__/
 *.py[cod]
