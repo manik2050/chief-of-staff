@@ -59,7 +59,7 @@ def version(path, query, headers):
 
 def handle(path, query=None, headers=None):
     ver = version(path, query or {}, headers or {})
-    extra = {"Vary": "Accept"}
+    extra = {}
     if ver == 1:
         extra["Deprecation"] = "true"
         extra["Sunset"] = "Wed, 01 Jul 2026 00:00:00 GMT"  # academy example
@@ -86,9 +86,10 @@ the transition (an [API gateway](../api-gateway/) can route `/v1` and `/v2`
 to different backends). Query keeps the URL stable but needs custom
 routing and cache keys; [API design](../api-design-best-practices/) said
 to avoid it because query is for filter/search. Header or media type keeps
-the URI stable but is harder to debug and cache, so send `Vary: Accept`;
-the article calls it the cleanest long-term choice while also saying no
-single strategy is best. Its "when": path for internal consumers you
+the URI stable but is harder to debug and cache; with the version in
+`Accept`, send `Vary: Accept`. The article calls header versioning the
+cleanest long-term choice while also saying no single strategy is best.
+Its "when": path for internal consumers you
 control, header for external or long-lived clients, payload for events
 replayed later. Stripe uses a CalVer `Stripe-Version` header; GitHub a
 date header on a stable base URL, each version supported at least 24
@@ -98,7 +99,8 @@ months. To retire v1, send `Deprecation: true` plus a `Sunset` HTTP-date
 Sources: [systemdesign42/system-design-academy](https://github.com/systemdesign42/system-design-academy)
 ([API Versioning](https://newsletter.systemdesign.one/p/api-versioning)
 (contract; `/v1/` does not freeze it; internal vs public; additive vs
-explicit; path, query, header, media type, payload; Sunset example,
+explicit; path, query, header, media type, payload; `Vary: Accept` for
+the Accept-header case; Sunset example,
 `Deprecation: true`, 301; Stripe CalVer and GitHub 24 months; "when" by
 selector; additive good enough for most),
 [Best Practices for API Design](https://newsletter.systemdesign.one/p/best-practices-for-api-design)
