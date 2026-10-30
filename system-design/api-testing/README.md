@@ -3,32 +3,33 @@
 Learning evidence for Day 27 system design. Not part of the Chief of Staff
 install. The installer does not copy this folder.
 
-The academy's Part 1 article lists 25 API test types. The public section
-covers seven. The other names (negative through authorization) are listed
-there, not defined here. Primer has no API-testing chapter. Closest: HTTP
-health checks in service discovery, and A/B testing as a DNS routing method.
-
-Smoke is the first CI gate: health, login, or a basic read — did the API
-respond at all? A pass is not correctness; a fail stops the pipeline.
-Functional checks the spec (status, body, missing fields, bad token, bad
-payload). Unit isolates a handler, validator, or transformer with mocks:
-fastest, and mocks can still lie. Integration chains create/read/update/
-delete against realistic stores and finds seam bugs. E2E walks a real user
-journey; keep it small. Regression reruns old tests on every merge.
-Acceptance asks if the API does what the business promised; too coarse
-for every commit.
+The academy's Part 1 article names 25 API test types; its public section
+defines seven, sketched here (negative through authorization are named
+there, not defined here). Smoke is the first CI gate: a health check, a
+login, or a basic read; did the API respond at all? A pass is not
+correctness; a fail stops everything else. Functional holds each endpoint
+to its spec, happy and unhappy paths (missing fields, bad token, bad
+payload). Unit isolates a handler, validator, or transformer with mocked
+dependencies; fastest, but mocks do not always reflect reality.
+Integration chains create/read/update/delete against realistic stores and
+finds seam bugs. E2E walks a real user journey against real services.
+Regression reruns existing tests on every merge. Acceptance asks whether
+the API does what was promised. Primer has no API-testing chapter; closest
+are HTTP health checks in service discovery and A/B testing as a DNS
+routing method.
 
 ```
-  new build
+  new build / deployment
      |
      v
-+---------+  fail -> stop CI (responded? not: correct?)
-|  smoke  |
++---------+  fail -> stop everything else
+|  smoke  |  pass -> it responded (not: it is correct)
 +---------+
      |
      v
-  unit -> functional -> integration
-  then: regression on merge; E2E + acceptance on critical journeys
+  unit, functional, integration     (logic, spec, seams)
+  regression: every merge            E2E: critical journeys only
+  acceptance: final sign-off before a feature ships
 ```
 
 ```python
@@ -56,13 +57,14 @@ print("func", handle("POST", "/items", {}))
 # func (400, 'bad name')
 ```
 
-Smoke is cheap and not a safety net. Functional is the client-facing
-contract; it becomes a tax if it asserts incidental details. Unit tests
-let you refactor logic and miss serialization and auth propagation.
-Integration and E2E catch those seams and cost time and flake. Use smoke
-first in every pipeline, unit on pure logic, functional on the spec, a
-small integration suite per workflow (heavier nightly), E2E only on
-critical journeys, regression on every merge, acceptance as sign-off.
+Smoke is the cheapest guard and not a safety net. Functional tests become
+a tax if they assert incidental details instead of what clients need.
+Unit tests enable fearless refactoring but cannot find serialization or
+auth propagation bugs; integration tests can, at the cost of time, infra,
+and flake. E2E is the most realistic and the most expensive to maintain.
+Run smoke first in every pipeline, unit on pure logic, a small integration
+suite per workflow (heavier nightly), E2E only on critical journeys,
+regression on every merge (block on failure), acceptance as sign-off.
 
 Sources: [systemdesign42/system-design-academy](https://github.com/systemdesign42/system-design-academy)
 ([API Testing Types](https://newsletter.systemdesign.one/p/api-testing-types)
