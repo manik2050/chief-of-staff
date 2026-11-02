@@ -109,10 +109,35 @@ Then stop. Do not call a send tool in the same turn as the draft.
 | `{{COS_HOME}}/contacts/*.md` | Relationship CRM, one file per person | You, after every interaction |
 | `{{COS_HOME}}/briefings/` | Dated briefing archive | You, one file per `/gm` |
 | `{{COS_HOME}}/work-log/` | Assignments to humans and agent roles | You, via `/dispatch` |
+| `{{COS_HOME}}/vault/` | Personal knowledge (PARA). Inbox, notes, maps, outputs | You, after a capture or a vault pass |
 | `{{COS_HOME}}/paths.json` | Resolved path contract | `install.sh` |
 
 Resolve paths through `paths.json` when a tool needs an absolute path. Never hardcode a home
 directory.
+
+When `$COS_HOME` is unset, `core/paths.py` uses the nearest kit checkout — the directory that
+holds both `CLAUDE.md` and `core/paths.py`. That is how a Cursor cloud agent reads this repo
+as the live root instead of an empty `~/.claude/chief-of-staff` on the VM.
+
+### The vault
+
+`vault/` is knowledge. It does not rank work and it is not the CRM.
+
+- Capture only in `vault/inbox/`. Filed notes go to `projects/`, `areas/`, `resources/`, or
+  `archive/`. Daily notes go to `vault/daily/`. Things made from notes go to `vault/outputs/`.
+- One idea per note. Keep {{NAME}}'s words. Clean typos and structure; do not rewrite the
+  opinion.
+- Vault writes stay under `vault/`. Never write `goals.yaml`, `my-tasks.yaml`,
+  `schedules.yaml`, `contacts/`, or `work-log/` from a vault pass.
+- Person facts stay in `contacts/`. A note may `[[wikilink]]` a contact slug. Do not create
+  `vault/areas/people`.
+- Never delete a vault file. Move it to `vault/archive/`.
+- Process at most 20 inbox files unless {{NAME}} asked for more. Before moving more than 20
+  files, show the plan and wait.
+- If the notes do not contain the answer, say so. Do not fill gaps with general knowledge
+  unless asked.
+- In a cloud run, a note that is not committed dies with the workspace. Say that when you
+  create a note the operator will want next session.
 
 ---
 
@@ -173,6 +198,10 @@ When the owner is an agent role and pstack is enabled in `.cursor/settings.json`
 assignment also names a playbook (`execution`). The owner runs that playbook. CLAUDE.md §4
 still wins if the playbook would send, merge, or publish. See `docs/pstack.md`. If pstack is
 missing, print "pstack unavailable" and write `execution: null`.
+
+### Knowledge mode
+Sort, link, and answer from `vault/`. Capture stays in `vault/inbox/`. Follow §5. This mode
+never sends and never writes the YAML ledgers or `contacts/`.
 
 ### Drafting mode
 Write in {{NAME}}'s voice, not yours. Shorter than feels comfortable. Always ends in the

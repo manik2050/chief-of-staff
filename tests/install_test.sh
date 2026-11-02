@@ -103,6 +103,17 @@ check_file "$COS/contacts/jordan-rivera.md"
 check_dir  "$COS/briefings"
 check_dir  "$COS/drafts"
 check_dir  "$COS/work-log"
+check_dir  "$COS/vault"
+check_dir  "$COS/vault/inbox"
+check_dir  "$COS/vault/projects"
+check_dir  "$COS/vault/areas"
+check_dir  "$COS/vault/resources"
+check_dir  "$COS/vault/archive"
+check_dir  "$COS/vault/daily"
+check_dir  "$COS/vault/outputs"
+check_dir  "$COS/vault/maps"
+check_file "$COS/vault/README.md"
+check_file "$COS/vault/_template.md"
 check_file "$COS/work-log/_template.md"
 check_file "$COS/work-log/README.md"
 check_file "$COS/templates/weekly-status.md"
@@ -218,6 +229,39 @@ PY
     pass "paths.json lists work_log at the install dir"
   else
     fail "paths.json missing or wrong work_log dir"
+  fi
+  if python3 - "$COS/paths.json" "$COS/vault" "$COS/vault/inbox" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1]))
+vault_dir = data.get("dirs", {}).get("vault")
+inbox = (data.get("vault") or {}).get("inbox")
+sys.exit(0 if vault_dir == sys.argv[2] and inbox == sys.argv[3] else 1)
+PY
+  then
+    pass "paths.json lists vault and inbox at the install dir"
+  else
+    fail "paths.json missing or wrong vault paths"
+  fi
+  if python3 - "$REPO_DIR" <<'PY'
+import json, os, subprocess, sys
+from pathlib import Path
+repo = Path(sys.argv[1]).expanduser().resolve()
+env = os.environ.copy()
+env.pop("COS_HOME", None)
+out = subprocess.check_output(
+    [sys.executable, str(repo / "core" / "paths.py"), "--json"],
+    cwd=str(repo),
+    env=env,
+    text=True,
+)
+data = json.loads(out)
+want_vault = str(repo / "vault")
+sys.exit(0 if data.get("root") == str(repo) and data.get("dirs", {}).get("vault") == want_vault else 1)
+PY
+  then
+    pass "paths.py uses the kit checkout when COS_HOME is unset"
+  else
+    fail "paths.py did not treat the kit checkout as root"
   fi
 fi
 

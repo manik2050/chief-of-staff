@@ -289,6 +289,22 @@ for work_log_file in "$SCRIPT_DIR"/work-log/*.md; do
 done
 
 say ""
+say "Vault"
+make_dir "$COS_HOME/vault"
+for vault_sub in inbox projects areas resources archive daily outputs \
+                 outputs/writing outputs/decisions outputs/reviews maps; do
+  make_dir "$COS_HOME/vault/$vault_sub"
+done
+copy_if_missing "$SCRIPT_DIR/vault/README.md"    "$COS_HOME/vault/README.md"
+copy_if_missing "$SCRIPT_DIR/vault/_template.md" "$COS_HOME/vault/_template.md"
+for vault_sub in inbox projects areas resources archive daily outputs \
+                 outputs/writing outputs/decisions outputs/reviews maps; do
+  src="$SCRIPT_DIR/vault/$vault_sub/.gitkeep"
+  [ -f "$src" ] || continue
+  copy_if_missing "$src" "$COS_HOME/vault/$vault_sub/.gitkeep" --raw
+done
+
+say ""
 say "Templates"
 for template_file in "$SCRIPT_DIR"/templates/*.md; do
   [ -e "$template_file" ] || continue
