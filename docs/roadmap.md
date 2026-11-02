@@ -44,7 +44,8 @@ per PR.
 **`SKILL.md` packaging.** Commands are markdown playbooks executed by the agent. As they grow,
 the reusable parts (drafting in the operator's voice, tiering, cadence math) should be extracted
 into skills that several commands share, rather than being restated in each playbook. `skills/`
-is reserved. Do not copy pstack skills into it.
+is reserved. Do not copy pstack skills into it. Stageshow in `.agents/skills/` is a third-party
+Agent Skill for faux UI; it is not this item.
 First dispatch: `implement` / `authoring-a-skill`. One skill per PR.
 
 **CI and lifecycle gates.** The checks that keep a kit like this honest:

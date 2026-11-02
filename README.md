@@ -193,7 +193,12 @@ also wires user-level slash commands.
    owner runs `/poteto-mode` (or `/interrogate` for review). CLAUDE.md §4 still wins if a
    playbook would send or merge. Details: [`docs/pstack.md`](docs/pstack.md).
 
-5. **Rewrite `goals.yaml`** in the install root. Then type `/gm`.
+5. **Product stills fire from English, not a slash command.** Stageshow lives at
+   `.agents/skills/stageshow/`. Ask for a hero, mockup, bento, or cursor demo; the
+   always-on rule plus the skill description should load it. Do not use it from
+   `/gm`. Details: [`docs/stageshow.md`](docs/stageshow.md).
+
+6. **Rewrite `goals.yaml`** in the install root. Then type `/gm`.
 
    If slash commands are not listed yet, send the message `/gm`. The rule treats that as
    "run `commands/gm.md`". Same for `/triage`, `/my-tasks`, `/enrich`, `/dispatch`.
@@ -226,4 +231,5 @@ contributor-facing and separate from `CLAUDE.md`, which is the product.
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE).
+MIT. See [`LICENSE`](LICENSE). Stageshow (under `.agents/skills/stageshow/`) is
+separately MIT-licensed by Benji Taylor; see that folder's `LICENSE` and `NOTICE.md`.
