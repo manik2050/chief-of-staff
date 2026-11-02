@@ -1,33 +1,39 @@
 ---
 description: >-
-  Faux product UI, marketing stills, bento grids, cursor walkthroughs, framed
-  app windows, and Stageshow demos. Not for briefings, mail, or triage.
-alwaysApply: false
+  Auto-load Stageshow for product stills, mocked UI, heroes, bento grids, and
+  cursor demos. Always on so the agent does not wait for /stageshow.
+alwaysApply: true
 ---
 
-# Stageshow overlay for this kit
+# Stageshow — auto trigger
 
-The skill lives at `.agents/skills/stageshow/SKILL.md`. Read it before writing any
-faux UI. CoS usage and the don'ts: `docs/stageshow.md`.
+This kit includes Stageshow. **Do not wait for `/stageshow`.** If the request
+matches below, read `.agents/skills/stageshow/SKILL.md` in the same turn and
+follow it.
 
-## When this applies
+## Trigger (any of these, even without the word Stageshow)
 
-The operator asked for a fake or mocked UI, a product demo, a hero or feature-card
-illustration, a bento grid, or an animated cursor in an interface — even if they
-never said "Stageshow".
+The operator wants a **product illustration**, not a briefing or a code fix:
 
-## When it does not
+- a mocked / fake / faux UI, mockup, or product shot
+- a README or docs **hero**, feature card, marketing still
+- a **bento** grid, landing-page tile, or framed app window / phone / terminal
+- a **cursor demo**, walkthrough, looping animation of someone using the product
+- "make it look like a real app", "screenshot style", "animate assigning X"
 
-`/gm`, `/triage`, `/my-tasks`, `/enrich`, and `/dispatch` stay prose and YAML.
-Do not illustrate a briefing. Do not put a Stageshow component in `briefings/` or
-`work-log/`. Cursor Canvas is for durable data artifacts beside chat; this is for
-React illustrations in the repo.
+Then: read the skill, copy the closest gold example, restyle to this product,
+film. One interaction, one size. Ask nothing extra if the brief is already that
+specific.
+
+## Do not trigger
+
+`/gm`, `/triage`, `/my-tasks`, `/enrich`, `/dispatch` (unless done-when is a
+still). Mail, YAML, work-log files. Cursor Canvas for data tables. Do not
+decorate a briefing.
 
 ## Standing orders
 
-1. One idea, one size, one product. Copy the closest gold example; do not sketch
-   from a blank file.
-2. CLAUDE.md §4 still wins. Publishing a still or a page is a send. Draft, stop.
-3. Do not copy this skill into `skills/` or into the install root.
-4. Do not ship another product's identity. Restyle the gold to this kit.
-5. Film before handing over. A screenshot of the idle frame is not a rehearsal.
+1. CLAUDE.md §4 still wins. Publishing a still is a send.
+2. Do not copy this skill into `skills/` or the install root.
+3. Do not ship another product's identity.
+4. A screenshot of the idle frame is not a rehearsal.

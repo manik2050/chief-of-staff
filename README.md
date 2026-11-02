@@ -193,10 +193,10 @@ also wires user-level slash commands.
    owner runs `/poteto-mode` (or `/interrogate` for review). CLAUDE.md §4 still wins if a
    playbook would send or merge. Details: [`docs/pstack.md`](docs/pstack.md).
 
-5. **Stageshow is already in the repo** at `.agents/skills/stageshow/`. Cursor loads it
-   as a project skill. Use it for faux product UI (README heroes, feature cards, looping
-   cursor demos). Do not use it from `/gm`. Details: [`docs/stageshow.md`](docs/stageshow.md).
-   Type `/stageshow` in Agent chat, or ask for one interaction at one size.
+5. **Product stills fire from English, not a slash command.** Stageshow lives at
+   `.agents/skills/stageshow/`. Ask for a hero, mockup, bento, or cursor demo; the
+   always-on rule plus the skill description should load it. Do not use it from
+   `/gm`. Details: [`docs/stageshow.md`](docs/stageshow.md).
 
 6. **Rewrite `goals.yaml`** in the install root. Then type `/gm`.
 

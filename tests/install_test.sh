@@ -395,6 +395,12 @@ if [ -f "$REPO_DIR/.agents/skills/stageshow/SKILL.md" ]; then
 else
   fail "missing .agents/skills/stageshow/SKILL.md"
 fi
+if grep -qE '^alwaysApply: true$' "$REPO_DIR/.cursor/rules/stageshow.mdc" \
+   && grep -qF 'Do not wait for `/stageshow`' "$REPO_DIR/.cursor/rules/stageshow.mdc"; then
+  pass "Stageshow overlay always-applies and does not require the slash command"
+else
+  fail "Stageshow overlay is not an always-on auto trigger"
+fi
 
 # -------------------------------------------------------------------------------- summary
 printf '\n%s passed, %s failed\n' "$PASSED" "$FAILED"

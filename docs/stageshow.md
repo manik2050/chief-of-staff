@@ -1,70 +1,61 @@
 # Stageshow in this kit
 
-[Stageshow](https://benji.org/stageshow) is Benji Taylor's skill for faux product UI:
-stills, cursor walkthroughs, bento grids, phones, heroes. It is a Cursor Agent Skill,
-not a CoS command. It does not change `/gm`, triage, or approval.
+Stageshow is a **product-illustration skill**. It teaches the agent to build a
+small React scene that *looks like* a real app: a cropped window, a phone, a
+bento tile, or a short cursor walkthrough. It is not a screenshot of this repo
+and not a Cursor Canvas. It is fake UI, framed on purpose, with real words only
+where the story is.
 
-Upstream: [benjitaylor/skills](https://github.com/benjitaylor/skills)
-(`stageshow/`). Essay: [benji.org/stageshow](https://benji.org/stageshow).
-Installed here as `.agents/skills/stageshow/` so this folder's agents, including
-Cloud Agents, actually see it.
+Upstream: [benjitaylor/skills](https://github.com/benjitaylor/skills),
+[benji.org/stageshow](https://benji.org/stageshow). Installed at
+`.agents/skills/stageshow/` so agents in this folder, including Cloud Agents,
+can load it. It is not a CoS slash command. It does not change `/gm`, triage, or
+approval.
 
-## What to do with it
+## How it fires (you do not type a command)
 
-Use it when the deliverable is a **product illustration in React**: a README hero,
-a feature card, a homepage bento, a looping cursor demo of the OS, a still of a
-briefing or inbox that should look like a shipping product. Ask for one interaction,
-in one product, at one size.
+Cursor keeps a catalog of project skills. Each skill's `description` is what the
+agent uses to decide relevance (**Agent Decides**). Stageshow's description
+already covers mocked UI, heroes, bentos, and cursor demos.
+
+This repo also always-applies `.cursor/rules/stageshow.mdc`. Every turn, the
+agent is told: if the ask matches those triggers, **read the skill now**. It
+must not wait for `/stageshow`.
+
+You just talk:
 
 ```text
-A small looping demo for a homepage hero: someone assigns a dispatch to an agent
-owner. Light, standard fidelity. Crop the window off the right edge.
+Make a README hero: someone assigns a dispatch to an agent owner.
+Light, looping, window cropped off the right edge.
 ```
 
-Or invoke `/stageshow` in Agent chat. To keep it on for the whole session, use it as
-a Custom Mode.
+That is enough. `/stageshow` still exists as a manual override (or a Custom
+Mode if you want the skill pinned for a whole session). It is not the normal
+path.
 
-Then the agent reads `.agents/skills/stageshow/SKILL.md`, copies the closest gold
-example, restyles it to this product, and films the result.
+It will **not** fire on `/gm`, inbox triage, or "add a task". Those stay prose.
 
-## What not to do with it
+## What you get
 
-Do not run it from `/gm`, `/triage`, `/my-tasks`, `/enrich`, or `/dispatch` unless
-the assignment's done-when is a still or demo. A briefing is one screen of prose
-(CLAUDE.md §14). A drafted email is text. A work-log file is markdown.
+A React component built from the kit in `.agents/skills/stageshow/kit/`,
+starting from a gold example, then filmed. Output belongs on a page or in
+README assets, not in `briefings/` or `work-log/`.
 
-Do not replace Cursor Canvas with it. Canvas is a durable artifact beside chat
-(`WriteCanvas`). Stageshow is ordinary React in the repo that you can ship on a
-page. Pick Canvas for a metrics table; pick Stageshow for a framed product shot.
+## What it will not do
 
-Do not copy the skill into `skills/`. That directory is reserved for this kit's
-own `SKILL.md` packaging (`docs/roadmap.md`). Do not copy it into
-`~/.claude/chief-of-staff/` — the installer must not.
+- Replace Canvas (data beside chat) or decorate a briefing (CLAUDE.md §14).
+- Land in `skills/` or in `~/.claude/chief-of-staff/` (installer must not copy it).
+- Paste Linear/Figma chrome onto this OS. Product studies are for motion, not identity.
 
-Do not paste another company's identity onto a CoS still. Product studies in
-`examples/` are for borrowing an interaction, not Linear's chrome on our briefing.
+## Playground (optional, for you to look)
 
-## How it runs in this repo
-
-1. Read `SKILL.md` in full before writing UI.
-2. From `.agents/skills/stageshow/`: `npm install` then `npm run dev`. Preview at
-   `http://stageshow.localhost:1355` (or the Vite URL on Windows). Node 20.19+.
-3. Copy the closest gold example. Film it first. Then change look and copy to this
-   product. A rename-only copy is not done.
-4. Output lives with the host (README assets, a docs page, a site), not in
-   `briefings/` or `work-log/`.
-5. Film with `node scripts/film.mjs` as the skill says. A still is not proof of
-   motion.
-
-The kit needs React, react-dom, and lucide-react. Copy `kit/` into the host
-project; do not import from `.agents/skills/...` at runtime in shipping code.
+Node 20.19+. From `.agents/skills/stageshow/`: `npm install` then `npm run dev`.
+Preview at `http://stageshow.localhost:1355` (or the Vite URL on Windows).
 
 ## Dispatch
 
-A still or demo is `implement` / `feature` (or a human designer). `done_when` is
-the component plus a filmed still at the shown width. `out_of_scope` includes
-sending, merging, and rewriting CoS playbooks. CLAUDE.md §4 still wins: publishing
-the still still needs a yes.
+A still or demo is `implement` / `feature`. `done_when`: the component plus a
+filmed still at the shown width. Publishing still needs a yes (CLAUDE.md §4).
 
 ## Update
 
@@ -72,6 +63,6 @@ the still still needs a yes.
 npx skills add benjitaylor/skills --skill stageshow --agent cursor
 ```
 
-Review the diff. Keep `LICENSE` and `NOTICE.md`. Do not rewrite the skill in place
-to "fit CoS"; put CoS constraints in this file and in
+Review the diff. Keep `LICENSE` and `NOTICE.md`. Do not rewrite the upstream
+skill to "fit CoS"; keep kit constraints in this file and in
 `.cursor/rules/stageshow.mdc`.

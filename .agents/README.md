@@ -17,7 +17,9 @@ Installed from [benjitaylor/skills](https://github.com/benjitaylor/skills)
 
 How it fits this kit: [`docs/stageshow.md`](../docs/stageshow.md).
 The skill itself: [`skills/stageshow/SKILL.md`](skills/stageshow/SKILL.md).
-License and notices stay in that folder.
+It auto-triggers from the skill description plus
+`.cursor/rules/stageshow.mdc` (`alwaysApply: true`). You do not need
+`/stageshow`. License and notices stay in that folder.
 
 Refresh from upstream (re-copies; review the diff). `skills-lock.json` at the repo
 root pins the hash the CLI computed.

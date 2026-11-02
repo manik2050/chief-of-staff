@@ -123,6 +123,7 @@ It asserts:
 - `.github/workflows/install-test.yml` exists and invokes `./tests/install_test.sh`
 - `docs/build-log/` stays in the repo and is not copied into the install root
 - `.agents/skills/` (Stageshow) stays in the repo and is not copied into the install root
+- Stageshow's overlay rule always-applies so a plain-English UI ask loads the skill
 
 Add a case to it for anything you change in `install.sh`.
 
