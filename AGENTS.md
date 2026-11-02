@@ -20,7 +20,9 @@ work-log/          assignments: README, _template.md; /dispatch writes the rest
 templates/         weekly-status.md (used by /my-tasks status)
 core/paths.py      the path contract; nothing else may build paths
 docs/              mcp-servers.md, cursor-projects.md, pstack.md, roadmap.md,
+                   stageshow.md (optional skill; not installed),
                    build-log/ (public shipping notes; not installed)
+.agents/skills/    third-party Agent Skills (Stageshow). Not the kit `skills/` dir.
 .cursor/           project rule, pstack-execution rule, settings.json (pstack on),
                    mcp.json.example, command links
 .github/           workflows/install-test.yml — runs tests/install_test.sh
@@ -55,6 +57,9 @@ tests/             shell tests for the installer
    on for this repo. Do not copy pstack `SKILL.md` files into `skills/`. That directory is
    reserved for this kit's own packaging. Agent owners run the playbook `/dispatch` wrote;
    CLAUDE.md §4 still gates send, merge, and publish. See `docs/pstack.md`.
+9. **Third-party Agent Skills live in `.agents/skills/`, not in `skills/`.** Stageshow is
+   installed there so Cursor loads it. Do not copy it into the install root. Do not teach
+   `/gm` to illustrate a briefing. Usage: `docs/stageshow.md`.
 
 ## Writing a command playbook
 
@@ -117,6 +122,7 @@ It asserts:
   degrades to `execution: null` when pstack is off
 - `.github/workflows/install-test.yml` exists and invokes `./tests/install_test.sh`
 - `docs/build-log/` stays in the repo and is not copied into the install root
+- `.agents/skills/` (Stageshow) stays in the repo and is not copied into the install root
 
 Add a case to it for anything you change in `install.sh`.
 

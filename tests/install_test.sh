@@ -385,6 +385,16 @@ if [ -e "$COS/.github" ]; then
 else
   pass ".github is not installed (repo-only)"
 fi
+if [ -e "$COS/.agents" ] || [ -e "$COS/docs/stageshow.md" ]; then
+  fail "installer copied Stageshow into the install root"
+else
+  pass "Stageshow stays in the repo (.agents/skills) and is not installed"
+fi
+if [ -f "$REPO_DIR/.agents/skills/stageshow/SKILL.md" ]; then
+  pass "repo has Stageshow as a project skill"
+else
+  fail "missing .agents/skills/stageshow/SKILL.md"
+fi
 
 # -------------------------------------------------------------------------------- summary
 printf '\n%s passed, %s failed\n' "$PASSED" "$FAILED"
