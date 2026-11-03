@@ -11,7 +11,6 @@ HTTP methods: GET read, POST create, PUT replace, DELETE remove. It stays
 stateless, so any server can answer. GraphQL is one endpoint: the client
 names the fields, the server walks the query and returns that shape in
 one round trip (queries read, mutations change, subscriptions stream).
-
 Authentication proves who is calling; a failed check is 401 and never
 reaches business logic. Authorization then decides what that identity may
 do; a known caller who still may not is 403. Rate limiting counts per
@@ -69,7 +68,6 @@ offsets for admin tables. Primer: REST exposes data through URIs and
 GET/POST/PUT/DELETE/PATCH, is stateless and cacheable, and is often used
 for public HTTP APIs; nested views need multiple round trips and extra
 fields bloat older clients.
-
 REST for public APIs, mobile and web, edge-cached reads, and endpoints a
 new developer should guess on the first try (Spring, Express, Django REST
 Framework, FastAPI). GraphQL for mobile on slow networks, screens that
