@@ -56,35 +56,31 @@ print("yellow", maybe(bits, "yellow"), loc("yellow"))
 # yellow True [8, 8, 0]   never inserted; those bits were already set
 ```
 
-Add runs k hashes, maps each onto a bucket, and sets those bits to one.
-The same bucket can be set more than once because hashes collide. Check
-repeats the hashes. A zero means never added. All ones means maybe:
-another item or a collision may have set them. The article's green query
-is that false-positive case: red and blue already turned on 3, 4, and 5.
-Time is O(k) for add and for membership, independent of how many items
-are already stored; the k lookups do not depend on each other and can run
-in parallel. Space is a fixed bit array (the article calls this constant
-/ O(1)): the filter stores bits, not the items. Accuracy depends on k,
-hash quality, n, and how many items were inserted. Faster, independent,
-uniform hashes help. The false-positive rate cannot be driven to zero.
-
-Advantages the article names: constant time, constant space, parallel
-operations, no false negatives, and privacy because the actual items are
-not stored. Disadvantages: the classic filter has no delete, false
-positives cannot reach zero, and a filter on disk needs random access
-because hashes scatter the indices. Do not clear a bit to "remove" an
-item: other items may share it, and a clear would create a false
-negative.
-
-Use it on high-ingestion paths to skip disk seeks for keys that are not
-there. The article names in-memory filters in front of large on-disk
-tables, Cassandra LSM SSTables, taken user IDs, already-shown
-recommendation posts, spell checkers (misspellings and profanity),
-malicious URLs / blocked IPs / fraud, and MapReduce over large datasets.
-Counting, scalable, and striped Bloom filters exist as named extensions;
-quotient and cuckoo filters are named as related structures.
-
-The primer has no Bloom filter or probabilistic-membership section.
+Add runs k hashes, maps each onto a bucket, and sets those bits to one;
+the same bucket can be set more than once because hashes collide. Check
+repeats the hashes: a zero means never added; all ones means maybe
+(another item or a collision may have set them). The article's green
+query is that false-positive case: red and blue already turned on 3, 4,
+and 5. Time is O(k) for add and for membership, independent of how many
+items are already stored; the k lookups can run in parallel. Space is a
+fixed bit array (the article calls this constant / O(1)): the filter
+stores bits, not the items. Accuracy depends on k, hash quality, n, and
+how many items were inserted; faster, independent, uniform hashes help,
+and the false-positive rate cannot be driven to zero. Advantages the
+article names: constant time, constant space, parallel operations, no
+false negatives, and privacy because the actual items are not stored.
+Disadvantages: the classic filter has no delete, false positives cannot
+reach zero, and a filter on disk needs random access because hashes
+scatter the indices — do not clear a bit to "remove" an item, or shared
+bits create false negatives. Use it on high-ingestion paths to skip disk
+seeks for keys that are not there: the article names in-memory filters
+in front of large on-disk tables, Cassandra LSM SSTables, taken user
+IDs, already-shown recommendation posts, spell checkers (misspellings
+and profanity), malicious URLs / blocked IPs / fraud, and MapReduce
+over large datasets. Counting, scalable, and striped Bloom filters
+exist as named extensions; quotient and cuckoo filters are named as
+related structures. The primer has no Bloom filter or
+probabilistic-membership section.
 
 Sources: [systemdesign42/system-design-academy](https://github.com/systemdesign42/system-design-academy)
 ([Bloom Filter](https://systemdesign.one/bloom-filters-explained/)
