@@ -46,24 +46,21 @@ print("others still served", ok)
 # others still served 90
 ```
 
-Customer placement maps a partition key onto a cell; Customer ID is
-the usual key. The router stays thin and horizontally scalable so it
-does not become the failure. Each cell has a fixed maximum size so
-scale-out is add-a-cell, not grow-without-limit, and stress tests stay
-repeatable. Deploy in waves: one cell first, watch metrics, roll back
-or continue. A cell can be a monolith, microservices, or serverless
-inside a bounded context — a copy of that environment, not a
-replacement for microservices. Slack, DoorDash, and Amazon run it
-(article names them; no metrics invented here). Cost and complexity
-rise because of infrastructure redundancy; use it when the blast radius
-matters.
-
-When: high availability, systems too big to fail, low RTO, many test
-combinations with insufficient coverage, poison-pill containment,
-buggy-deploy isolation. Anti-patterns the article names: unbounded
-cell growth, deploy to every cell at once, shared state, complex
-routing logic, chatty cells. Keep dependencies between cells to a
-minimum; no shared databases.
+Customer placement maps a partition key onto a cell; Customer ID is a
+candidate key for most use cases. The router stays thin and horizontally
+scalable so it does not become the failure. Each cell has a fixed
+maximum size, so scale-out means adding a cell and stress testing is
+easier. Deploy in waves: one cell first, watch metrics, roll back or
+continue. A cell can be a monolith, microservices, or serverless inside
+a bounded context — a copy of that environment, not a replacement for
+microservices. Slack, DoorDash, and Amazon run it. Cost and complexity
+rise because of infrastructure redundancy, so use it only when needed:
+high availability, systems too big to fail, low RTO, many test
+combinations with insufficient coverage, poison-pill containment, and
+buggy-deploy isolation. Anti-patterns the article names: unbounded cell
+growth, deploy to every cell at once, shared state, complex routing
+logic, chatty cells. Keep dependencies between cells to a minimum; no
+shared databases.
 
 Sources: [systemdesign42/system-design-academy](https://github.com/systemdesign42/system-design-academy)
 ([How 0.1% Companies Do Hyperscaling](https://newsletter.systemdesign.one/p/cell-based-architecture)
