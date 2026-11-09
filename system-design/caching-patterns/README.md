@@ -41,7 +41,7 @@ miss rate. Use when no update is expected and reads are few.
 | write through | cache, sync | cache then db | fresh | few writes, freshness |
 | read through | cache | (read path) | may stale | read-heavy; miss ok |
 | write back | cache, async | cache; db later | fresh | write-heavy; not durable |
-| write around | app | db, then lazy fill | miss/stale | no updates; few reads |
+| write around | app | db, then lazy fill | miss, then fresh | no updates; few reads |
 
 ```python
 # Toy: dict cache + dict db. python3 - <<'PY' ... PY
@@ -60,9 +60,9 @@ def demo(name, to_cache, to_db, start_cache=True):
     flag = "fresh" if val == "new" else "stale"
     print(f"{name:13} db_r={n['r']} db_w={n['w']} {val} {flag}")
 
-demo("aside", False, True)                # miss fill: app
+demo("aside", False, True)                # stale hit; miss fill would be app
 demo("write-through", True, True)
-demo("read-through", False, True)         # miss fill: cache
+demo("read-through", False, True)         # stale hit; miss fill would be cache
 demo("write-back", True, False)
 demo("write-around", False, True, False)  # empty cache; miss fill: app
 # aside         db_r=0 db_w=1 old stale
