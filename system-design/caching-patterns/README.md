@@ -23,7 +23,7 @@ few writes are expected and freshness is important.
 Read through: the same four read steps as cache aside, except the cache
 talks to the database, not the app. Low read latency for hot data, and
 better read scalability. The cache can be stale; a miss is slow. Use on
-read-heavy workloads where a high miss rate is acceptable.
+read-heavy workloads. A high miss rate is acceptable.
 
 Write back (write-behind): the app writes the cache; the cache writes the
 database asynchronously, and those writes can be batched. Low write
@@ -45,8 +45,9 @@ miss rate. Use when no update is expected and reads are few.
 
 ```python
 # Toy: dict cache + dict db. python3 - <<'PY' ... PY
-def demo(name, to_cache, to_db):
-    db, cache, n = {"k": "old"}, {"k": "old"}, {"r": 0, "w": 0}
+def demo(name, to_cache, to_db, start_cache=True):
+    db, n = {"k": "old"}, {"r": 0, "w": 0}
+    cache = {"k": "old"} if start_cache else {}
     if to_cache:
         cache["k"] = "new"
     if to_db:
@@ -55,25 +56,27 @@ def demo(name, to_cache, to_db):
         val = cache["k"]
     else:
         n["r"] += 1
-        val = cache["k"] = db["k"]
+        val = cache["k"] = db["k"]  # miss fill: app (aside/around) vs cache
     flag = "fresh" if val == "new" else "stale"
     print(f"{name:13} db_r={n['r']} db_w={n['w']} {val} {flag}")
 
-demo("aside", False, True)
+demo("aside", False, True)                # miss fill: app
 demo("write-through", True, True)
-demo("read-through", False, True)
+demo("read-through", False, True)         # miss fill: cache
 demo("write-back", True, False)
-demo("write-around", False, True)
+demo("write-around", False, True, False)  # empty cache; miss fill: app
 # aside         db_r=0 db_w=1 old stale
 # write-through db_r=0 db_w=1 new fresh
 # read-through  db_r=0 db_w=1 old stale
 # write-back    db_r=0 db_w=0 new fresh
-# write-around  db_r=0 db_w=1 old stale
+# write-around  db_r=1 db_w=1 new fresh
 ```
 
 Write-through and write-back update the cache, so the next read is fresh.
-Aside, read-through, and write-around wrote the database only, so a
-pre-filled cache is still old (the inconsistency the article names).
+Aside and read-through wrote the database only, so a pre-filled cache is
+still old (the inconsistency the article names). Write-around skipped the
+cache on write too; with an empty cache the read misses and loads the new
+value (the article's high read latency / miss rate cost).
 Write-back has not flushed (`db_w=0`); a crash before that flush is the
 data-loss risk. Combos of these patterns are what real systems run.
 
