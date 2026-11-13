@@ -5,12 +5,12 @@ install. The installer does not copy this folder.
 
 Consistent hashing puts nodes and keys on a virtual ring (the hash ring).
 The same hash function hashes a node's IP or domain and each data key onto
-that circle; MD5 is used as a uniform, independent hash. The largest hash wraps
-to the smallest. From a key, walk clockwise to the first node whose position
-is greater; that node stores or returns the object. Each node owns the arc
-from its predecessor. Virtual nodes hash one physical ID through distinct
-functions onto many spots so keys spread more evenly, and a higher-capacity
-node can take more spots.
+that circle; a uniform, independent hash such as MD5 is used. The largest
+hash wraps to the smallest. From a key, walk clockwise to the first node
+whose position is greater; that node stores or returns the object. Each
+node owns the arc from its predecessor. Virtual nodes hash one physical ID
+through distinct functions onto many spots so keys spread more evenly, and
+a higher-capacity node can take more spots.
 
 Static partitioning does node ID = hash(key) mod N. Lookup is O(1), but
 adding or removing a node breaks existing maps and forces massive data
@@ -18,23 +18,6 @@ movement; most requests miss and swamp the origin. Cache replication does
 not fix dynamic load: only a limited set fits, and keeping replicas consistent
 is expensive. The ring exists so cache servers can scale with demand while
 remapping far fewer keys when N changes.
-
-It scales horizontally, moves less data when N changes, and makes replication
-and partitioning quicker. Average keys on a node is k/N; add or remove moves
-about that many. Uneven placement creates hot spots and cascading failure,
-and the basic ring ignores that nodes differ in performance. Virtual nodes
-spread load — including during downtime, when a new node joins, and across
-heterogeneous machines — but a popular object still hits the same subset of
-nodes, capacity planning is trickier, a BST of positions costs memory and
-operational complexity, replication needs extra logic to pick distinct
-physical nodes, and downtime of a virtual node hits multiple spots. BST
-add/remove node is O(k/n + log n); add/remove key is O(log n).
-
-Use it to partition data or to load-balance. Discord finds the nodes that
-host a server this way. DynamoDB, Cassandra, and Riak partition with it for
-incremental scale. Vimeo load-balances video traffic; Netflix places uploads
-on a CDN. Memcached clients (Ketama) and Dynamo ship it; HAProxy has a
-bounded-load variant.
 
 ```
   hash(key), hash(node) -> same ring; largest hash wraps to smallest
@@ -82,9 +65,25 @@ print("1/N   ", K // N)
 # 1/N    250
 ```
 
-This toy used 1000 keys, 4 nodes, and 64 virtual spots each. Adding a fifth
-node remapped 782 keys under modulo and 203 on the ring. 1/N of 1000 is 250,
-so the ring moved about 1/N of the keys; modulo moved most of them.
+It scales horizontally, moves less data when N changes, and makes
+replication and partitioning quicker. Average keys on a node is k/N; add
+or remove moves about that many. Uneven placement creates hot spots and
+cascading failure, and the basic ring ignores that nodes differ in
+performance. Virtual nodes spread load — including during downtime, when
+a new node joins, and across heterogeneous machines — but a popular
+object still hits the same subset of nodes, capacity planning is trickier,
+a BST of positions costs memory and operational complexity, replication
+needs extra logic to pick distinct physical nodes, and downtime of a
+virtual node affects multiple nodes on the ring. BST add/remove node is
+O(k/n + log n); add/remove key is O(log n). Use it to partition data or
+to load-balance. Discord finds the nodes that host a server this way.
+DynamoDB, Cassandra, and Riak partition with it for incremental scale.
+Vimeo load-balances video traffic; Netflix distributes uploaded video
+across a CDN. Memcached clients (Ketama) and Dynamo ship it; HAProxy has
+a bounded-load variant. This toy used 1000 keys, 4 nodes, and 64 virtual
+spots each (counts are from the toy, not the article). Adding a fifth
+node remapped 782 keys under modulo and 203 on the ring. 1/N of 1000 is
+250, so the ring moved about 1/N of the keys; modulo moved most of them.
 
 Sources: Neo Kim,
 [Consistent Hashing Explained](https://systemdesign.one/consistent-hashing-explained/)
