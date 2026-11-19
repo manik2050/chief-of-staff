@@ -6,7 +6,7 @@ install. The installer does not copy this folder.
 Most people think system design is about building the "best"
 architecture. Neo Kim's letter says it is not: it is about making the
 right tradeoffs for a given workload and constraints. He then lists 50
-pairs, each with what you gain, what it costs, and when to pick each side.
+pairs; most say what you gain, what it costs, and when to pick each side.
 The sketch shows five of them, by their number in the letter.
 
 He closes with the pattern behind all 50: every architecture choice gives
