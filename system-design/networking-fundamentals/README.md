@@ -3,90 +3,81 @@
 Learning evidence for Day 43 system design. Not part of the Chief of Staff
 install. The installer does not copy this folder.
 
-## What
+Computer networking is part of every system an engineer works on. Junior
+developers may get by writing code; senior engineers are valued for
+understanding how systems communicate and for troubleshooting network
+problems: what happens when a connection fails, how data travels between
+devices and servers, and how to diagnose slow links, packet loss, and
+routing problems.
 
-Computer networking sits under every system you will work on. Juniors can
-get by writing code; seniors are valued for how systems communicate and
-for troubleshooting network problems.
+Inside one local network, Ethernet frames carry IP packets between MAC
+addresses, switches forward them by MAC, and Wi-Fi shares one radio
+channel. A device gets its IP address by hand or a DHCP reservation
+(static) or by leasing one through DHCP. Traffic leaves the network
+through a default gateway, follows static routes or routes OSPF works out,
+and ICMP and ping report when a path does not answer.
 
-When a connection fails, how does data travel between devices and
-servers, and how do you diagnose slow links, packet loss, and routing?
-Those questions sit under every reliable, high-performing system.
-
-## Why
-
-Frames and MAC addresses move traffic on a LAN. IP, default gateways,
-static routes, and OSPF move it between networks. DHCP and static
-addresses decide who holds an IP. ICMP and ping are how you ask whether
-a path answers.
-
-## Tradeoffs
-
-2.4 GHz Wi-Fi reaches farther with less capacity and more interference;
-5 GHz and 6 GHz are faster, shorter-range, and weaker through obstacles. A
-weak client transmits slower and uses more airtime, cutting capacity for
-everyone on the channel. A static IP stays put for DNS and firewalls;
-DHCP assigns on join and reassigns after a lease expires. A static route
-does not learn a new path and still points at a failed one unless
-something deactivates it. OSPF recalculates after failures; convergence
-depends on detection, topology size, and configuration. ICMP is not
-guaranteed to arrive: firewalls and rate limits can drop it.
-
-## When to use / when not
-
-Use a static IP, or a DHCP reservation, for servers, printers, and
-routers. Use DHCP for laptops and phones that join and leave. Use a
-static route for a known path, including cloud route tables. Use OSPF
-inside an autonomous system that must reroute on failure. Use a switch
-on the same network and a router between networks. Use ping to test
-whether a host answers ICMP and to measure round-trip time. Skip static
-routes when paths change under you. A wrong default gateway breaks
-off-net access while local still works. A ping reply is not proof an
-application is up.
-
-- Ethernet: LAN; wrap an IP packet in a frame with MACs; switch it; check the FCS.
-- MAC addresses: 48-bit card id (six hex pairs); IP between nets, MAC within one; ARP then cache.
-- Switches: learn source MAC to port; known dest there; unknown floods other VLAN ports.
-- Wi-Fi: radio; CSMA/CA; 2.4 / 5 / 6 GHz; retransmit lost frames; poor signal uses airtime.
-- Static IPs: fixed by hand or DHCP reservation; same across reboots while valid.
-- DHCP: DORA (Discover, Offer, Request, Acknowledge); mask, gateway, DNS; renew or reassign.
-- Default gateways: hop when no specific route exists; 192.168.1.10/24 uses 192.168.1.1.
-- Static routes: dest range and next hop, e.g. 10.0.2.0/24 via 192.168.1.1; they do not auto-learn.
-- OSPF: Hello, flood LSAs, shared link-state DB, Dijkstra lowest-cost paths; reroute on fail.
-- ICMP: unreachable, TTL exceeded, packet too big, echo; does not retransmit application data.
-- Ping: ICMP Echo Request and Reply; reports RTT and missing replies.
+```
+1  Ethernet          IP packet in a frame; src/dst MAC; switched; FCS check
+2  MAC address       48-bit card id; MAC within a network, IP between; ARP
+3  switch            learn src MAC -> port; known dst: that port; else flood
+4  Wi-Fi             radio; CSMA/CA; 2.4 / 5 / 6 GHz; lost frames resent
+5  static IP         fixed by hand or DHCP reservation; servers, printers
+6  DHCP              Discover, Offer, Request, Acknowledge; leased address
+7  default gateway   router for off-network traffic with no specific route
+8  static route      dest range + next hop; does not learn new paths
+9  OSPF              Hello, flood LSAs, link-state DB, Dijkstra; reroutes
+10 ICMP              unreachable, TTL exceeded, too big, echo; may be dropped
+11 ping              Echo Request / Reply; RTT and share of missing replies
+```
 
 ```python
-# Toy DHCP lease pool, not a server. Ticks are toy. python3 - <<'PY' ... PY
-pool, lease = ["addr-a", "addr-b"], {}
+# Toy DHCP lease pool, not a server; ticks are toy. python3 - <<'PY' ... PY
+pool, lease = ["addr-a", "addr-b"], {}  # free addrs; host -> (addr, until)
 
-def expire(t):
+def tick(t):  # free each lease that reached its end without a renewal
     for host, (addr, until) in list(lease.items()):
         if t >= until:
-            pool.append(addr)
             del lease[host]
-            print(f"t={t} expire {host} {addr}")
+            pool.append(addr)
+            print(f"t={t} expire {host} {addr}, no renewal")
 
-def dora(host, t, life=2):
-    expire(t)
+def join(host, t, life=2):  # one line for the whole DORA exchange
     addr = pool.pop(0)
-    until = t + life
-    lease[host] = (addr, until)
-    print(f"t={t} DORA {host} {addr} until {until}")
+    lease[host] = (addr, t + life)
+    print(f"t={t} DORA {host} {addr} until {t + life}")
 
-dora("laptop", 0)
-dora("phone", 0)
-dora("tablet", 2)
+def renew(host, t, life=2):  # before expiry: same address, later end
+    addr, _ = lease[host]
+    lease[host] = (addr, t + life)
+    print(f"t={t} renew {host} {addr} until {t + life}")
+
+join("laptop", 0)
+join("phone", 0)
+tick(1)
+renew("phone", 1)
+tick(2)
+join("tablet", 2)
 # t=0 DORA laptop addr-a until 2
 # t=0 DORA phone addr-b until 2
-# t=2 expire laptop addr-a
-# t=2 expire phone addr-b
+# t=1 renew phone addr-b until 3
+# t=2 expire laptop addr-a, no renewal
 # t=2 DORA tablet addr-a until 4
 ```
 
-Ticks and `addr-*` labels are toy. After expire, tablet gets `addr-a` — a
-reassigned lease.
+Give servers, printers, and routers a static IP or a DHCP reservation so
+DNS records and firewall rules can point at them; let laptops and phones
+lease through DHCP; devices typically renew before expiry, and a lapsed
+lease's address can go to the next device. 2.4 GHz typically reaches
+farther with less capacity and more interference; 5 and 6 GHz potentially
+run faster over shorter range. A wrong default gateway breaks off-network
+traffic while local traffic still works. A static route stays put even
+when its path fails, unless something deactivates it; OSPF recalculates,
+and how fast depends on failure detection, topology size, and
+configuration. ICMP can be blocked or dropped, and a ping reply does not
+prove the application on that host is up.
 
 Sources: Neo Kim,
 [11 Networking Concepts Explained in 11 Minutes](https://newsletter.systemdesign.one/p/computer-networking-fundamentals-for-software-engineers)
-(#195, Part 2 - Break Into Computer Networking, 23 Oct 2026).
+(System Design Newsletter #195, Part 2 - Break Into Computer Networking,
+23 Oct 2026).
