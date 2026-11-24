@@ -3,19 +3,21 @@
 Learning evidence for Day 44 system design. Not part of the Chief of Staff
 install. The installer does not copy this folder.
 
-A finished pipeline typically does not watch the cluster afterward. A
-manual `kubectl` change, a hotfix, or any apply outside Git can leave
-production different from the last reviewed config. GitOps makes Git the
-single source of truth: application and cluster changes go through
-commits, reviewed like code, not applied by hand. An in-cluster agent
-compares live state with Git and reconciles differences. CI still
-typically builds, tests, and publishes an image; with ArgoCD it then
-commits the new image tag to a config repo. ArgoCD detects the change,
-diffs it with live, and either applies (automated sync) or waits
-(manual). The letter is paid; only the public preview is cited.
-Reconciliation internals, sync policies, self-healing, hooks,
-ApplicationSets, secrets, access control, progressive delivery, and
-disaster recovery are paid and not covered.
+Once a CI/CD deployment finishes, the pipeline has no idea what happens
+inside the cluster afterward. Someone could edit a Deployment with
+`kubectl`, apply a hotfix during an incident, or update a resource by
+hand; those changes bypass Git and the pipeline. As they pile up, the
+cluster drifts from Git until production no longer matches the last
+reviewed configuration.
+
+GitOps makes a Git repository the single source of truth: every
+application or cluster change is a commit, reviewed and merged like
+code, not applied directly to the cluster. An agent compares the live
+cluster with the desired state in Git and reconciles differences. CI
+still builds, tests, and publishes the image, then commits the new image
+tag to the config repo. ArgoCD detects the change and diffs it with the
+live resources; with automated sync it applies, with manual sync it
+waits for an operator.
 
 ```
 drift              kubectl / hotfix outside Git; live != last reviewed config
@@ -23,7 +25,7 @@ GitOps             Git is single source of truth; changes via reviewed commits
 OpenGitOps (CNCF)  Declarative; Versioned and Immutable;
                    Pulled Automatically; Continuously Reconciled
 1 Declarative      YAML/Helm/Kustomize: end state, not a how-to script
-2 Versioned        desired-state change = Git commit; rollback can be a revert
+2 Versioned        desired-state change = Git commit; rollback = revert commit
 3 Pulled auto      in-cluster agent pulls Git; pipeline does not apply
 4 Reconciled       compare live vs Git; report or correct per sync policy
 push CD            pipeline kubectl apply / helm upgrade; creds live in CI
@@ -38,40 +40,49 @@ Notifications      Slack, email, PagerDuty, webhook
 ```
 
 ```python
-# Toy reconcile loop; ticks and names are toy. python3 - <<'PY' ... PY
-git, live = {"web": "v1"}, {"web": "v1"}  # desired Git; live cluster
+# Toy reconcile loop; versions, ticks, policy switch are toy. python3 - <<'PY' ... PY
+git, live = {"web": "v1"}, {"web": "v1"}  # desired (Git) vs live (cluster)
 
-def tick(t, policy):
-    drift = {k: (git[k], live[k]) for k in git if git[k] != live[k]}
-    if not drift:
-        print(f"t={t} {policy} Synced")
-        return
-    k, (want, have) = next(iter(drift.items()))
-    if policy == "manual":
-        print(f"t={t} {policy} OutOfSync {k} live={have} git={want}")
-        return
-    live[k] = want  # automated sync; toy self-heal
-    print(f"t={t} {policy} heal {k} {have} -> {want}")
+def reconcile(t, policy, note):
+    want, have = git["web"], live["web"]
+    if want == have:
+        print(f"t={t} {policy}: {note}, Synced {have}")
+    elif policy == "manual":
+        print(f"t={t} {policy}: {note}, OutOfSync live={have} git={want}, waits")
+    else:
+        live["web"] = want  # sync policy corrects the diff
+        print(f"t={t} {policy}: {note}, OutOfSync, applied {have} -> {want}")
 
-tick(0, "manual")
-live["web"] = "hotfix"  # kubectl-style drift
-tick(1, "manual")       # report only
-tick(2, "auto")         # corrects drift
-# t=0 manual Synced
-# t=1 manual OutOfSync web live=hotfix git=v1
-# t=2 auto heal web hotfix -> v1
+reconcile(0, "manual", "start")
+git["web"] = "v2"                  # CI commits new image tag to Git
+reconcile(1, "manual", "CI commit")
+reconcile(2, "auto", "CI commit")
+live["web"] = "hotfix"             # kubectl edit outside Git
+reconcile(3, "manual", "drift")
+reconcile(4, "auto", "drift")
+# t=0 manual: start, Synced v1
+# t=1 manual: CI commit, OutOfSync live=v1 git=v2, waits
+# t=2 auto: CI commit, OutOfSync, applied v1 -> v2
+# t=3 manual: drift, OutOfSync live=hotfix git=v2, waits
+# t=4 auto: drift, OutOfSync, applied hotfix -> v2
 ```
 
-GitOps with ArgoCD fits when Git should be the handoff: CI records the
-intended image; the cluster pulls and applies. Push-based CD can be
-simpler, but cluster credentials typically live in CI, so a compromised
-pipeline can often reach the cluster. Pull-based CD typically keeps those
-credentials in-cluster; a compromised pipeline can still change Git, but
-ArgoCD still has to pull, and the commit is reviewable first. Redis is a
-cache: ArgoCD can typically keep reconciling without it, with worse
-performance. Manual sync reports OutOfSync; automated sync can apply.
+GitOps with ArgoCD makes Git the handoff: CI produces the image and
+records the intended version; ArgoCD applies it. In push-based CD the
+cluster credentials live inside CI, so a compromised pipeline is
+effectively a compromised cluster, often with cluster-admin access. In
+pull-based CD, ArgoCD runs in the cluster with scoped RBAC and no cluster
+credentials leave it; a compromised CI could modify Git, but ArgoCD still
+has to pull the change, and the commit is reviewable first. Redis is a
+cache, not a primary store: if it goes down, performance suffers but
+reconciliation continues. The Repo Server stays apart from the
+Application Controller because rendering is often CPU-intensive and
+occasionally unstable.
 
 Sources: Neo Kim and Ayaan,
 [GitOps Deep Dive: How ArgoCD Works](https://newsletter.systemdesign.one/p/how-argocd-works-gitops-kubernetes)
-(System Design Newsletter #196, Part 5 - DevOps Mastermind, 26 Oct 2026;
-paid letter, public preview only).
+(System Design Newsletter #196: Part 5 - DevOps Mastermind, 26 Oct 2026;
+paid letter: drift, GitOps principles, push vs pull CD, the security
+boundary, and the five ArgoCD components are public; reconciliation
+internals, sync policies, self-healing, hooks, ApplicationSets, and
+production topics are paid and not covered).
