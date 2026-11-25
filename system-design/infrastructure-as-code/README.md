@@ -3,37 +3,41 @@
 Learning evidence for Day 45 system design. Not part of the Chief of Staff
 install. The installer does not copy this folder.
 
-Infrastructure as Code manages networks, servers, and access rules through
-configuration files in Git instead of console clicks. A change starts as a
-pull request; Git keeps history; the same files recreate another environment
-with different values. An imperative script lists how: create the network,
-save its ID, create the subnet, launch the server; run it again and it needs
-checks to skip duplicates and to handle partial failure. A declarative tool
-such as Terraform describes the desired end state in HCL. Core reads every
-`.tf` file in the working directory as one configuration (file layout does
-not set order), follows references to build a dependency graph, diffs that
-desired state against recorded state and the live platform, and plans which
-objects to create, update, or remove. Providers perform platform operations.
-State maps a resource address to the real object; Terraform inspects live
-infrastructure only when you run a command, so a console edit is not
-auto-fixed. Shared runs store state in a remote backend with locking.
+Infrastructure as Code creates and manages networks, servers, and access
+rules through configuration files instead of console clicks. The files stay
+in Git, so a change starts as a pull request, Git keeps the history, and the
+same files help recreate another environment with different values. An
+imperative script lists how: create the network, save its ID, create the
+subnet, launch the server. Run it again and it needs extra checks to avoid
+duplicates and to handle steps that succeed while others fail. A
+declarative tool such as Terraform describes the desired final state.
+
+Terraform reads all `.tf` files in the working directory as one HCL
+configuration; file layout does not control creation order. Core evaluates
+variables and expressions, loads existing state, follows references to
+build a dependency graph, and plans which objects to create, update,
+replace, or remove. Provider plugins handle platform-specific operations.
+State maps each resource address to its real object. Terraform only checks
+infrastructure when you run a command and does not automatically detect
+and fix every change made outside its configuration. By default state is a
+local file; shared runs use a remote backend, and some backends lock state.
 
 ```
 IaC            files in Git; PR before cloud; describes what should exist
 imperative     ordered how-to; re-run needs duplicate and failure checks
-declarative    desired end state; tool diffs and orders the work
-Terraform      HCL; one workflow across clouds; providers do platform APIs
+declarative    desired final state; tool works out order and changes
+Terraform      HCL; same workflow across platforms; providers do APIs
 .tf files      one dir = one config; layout is not execution order
-resource       owned object (VM, DNS); data source reads without owning
-provider       gRPC plugin; create, read, update, delete
-module         grouped resources so the same setup is not copied
+resource       managed object (VM, DNS); data source reads, does not own
+provider       separate process over gRPC; create, read, update, delete
+module         grouped resources so the same setup is not repeated
 meta           count/for_each: many instances; depends_on: hidden edges
 config         what should exist; live checked only when a command runs
 state          address -> real ID, attributes, outputs
 Core           eval, load state, graph, plan; apply records state
-backend        local default; remote + lock for shared runs; state not in Git
+backend        local default; remote for shared runs; some lock state
 implicit dep   subnet uses vpc.id => create the VPC first
-graph          independents together; destroy reverses; cycle is an error
+graph          independents can run in parallel; destroy reverses; cycle errors
 ```
 
 ```python
@@ -79,20 +83,21 @@ print("state", " ".join(f"{k}={state[k]}" for k in sorted(state)))
 # state dns=dns-1 subnet=sub-1 vpc=vpc-1
 ```
 
-Use IaC when a second environment must match the first and a console click
-is too easy to miss in review. Prefer declarative Terraform when the same
-graph spans networks, databases, and DNS on more than one platform: Core
-orders by references, so a server that uses a subnet in another file still
-waits, and independent resources proceed together. Reach for `depends_on`
-only when no value is referenced; extra edges make resources wait even
-when they could run in parallel. Local state is enough for one person
-learning; shared engineers or pipelines need a remote backend and locking
-so two applies do not write the same records. Restrict who can read state,
-encrypt it, and never commit it; `.terraform.lock.hcl` records provider
-versions and does belong in Git. Removing a resource block does not delete
-the cloud object until a later plan uses the leftover state entry. A
-written definition is a comparison, not a guard: someone can still click
-in the console or merge a bad setting.
+Most ordering comes from references: a subnet that uses `aws_vpc.main.id`
+waits for the VPC even when it sits in another file, while independent
+resources could be created in parallel. Use `depends_on` only for a
+dependency no reference shows, such as an IAM policy attachment an
+instance needs; unnecessary edges can leave resources waiting even when
+Terraform could create them in parallel. Local state works for learning or
+a small project alone. When many engineers or CI/CD pipelines share
+infrastructure, a remote backend gives them one state file, and supported
+backends lock it so only one run modifies it at a time. State can hold
+sensitive values, so restrict access to it and keep it out of Git;
+`.terraform.lock.hcl` records provider versions and checksums and normally
+belongs in Git. Removing a resource block does not immediately delete the
+cloud object; the leftover state entry tells the next plan what to delete.
+The written definition does not stop a console edit or an approved bad
+setting, but it gives a clear reference to compare against.
 
 Sources: Neo Kim and Ayaan,
 [Infrastructure as Code - A Deep Dive](https://newsletter.systemdesign.one/p/how-terraform-works-internally)
