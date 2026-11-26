@@ -25,6 +25,10 @@ work-log/*.md
 !work-log/README.md
 !work-log/_template.md
 
+# Skill playground install (the skill itself is committed; deps are local)
+.agents/skills/**/node_modules/
+.agents/skills/**/dist/
+
 # Test scratch
 tests/.tmp/
 .tmp/

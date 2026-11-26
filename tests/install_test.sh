@@ -385,6 +385,22 @@ if [ -e "$COS/.github" ]; then
 else
   pass ".github is not installed (repo-only)"
 fi
+if [ -e "$COS/.agents" ] || [ -e "$COS/docs/stageshow.md" ]; then
+  fail "installer copied Stageshow into the install root"
+else
+  pass "Stageshow stays in the repo (.agents/skills) and is not installed"
+fi
+if [ -f "$REPO_DIR/.agents/skills/stageshow/SKILL.md" ]; then
+  pass "repo has Stageshow as a project skill"
+else
+  fail "missing .agents/skills/stageshow/SKILL.md"
+fi
+if grep -qE '^alwaysApply: true$' "$REPO_DIR/.cursor/rules/stageshow.mdc" \
+   && grep -qF 'Do not wait for `/stageshow`' "$REPO_DIR/.cursor/rules/stageshow.mdc"; then
+  pass "Stageshow overlay always-applies and does not require the slash command"
+else
+  fail "Stageshow overlay is not an always-on auto trigger"
+fi
 
 # -------------------------------------------------------------------------------- summary
 printf '\n%s passed, %s failed\n' "$PASSED" "$FAILED"
