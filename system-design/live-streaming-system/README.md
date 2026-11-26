@@ -56,45 +56,25 @@ for bw in samples:
 
 HLS divides encoded video into segments; shorter segments could reduce
 latency but increase request overhead, while longer segments reduce request
-frequency but increase playback delay ([src]). Conventional HTTP-based live
-streaming uses segment durations around 2 to 10 seconds ([src]). RTMP runs
-over TCP, so packet loss could increase latency via head-of-line blocking
-([src]). SRT runs over UDP with selective retransmission inside a configured
-latency window ([src]). Cached CDN content could become stale; live segments
-are typically immutable once published, so they cache well, while frequently
-updated manifests need shorter cache durations ([src]). When bandwidth
+frequency but increase playback delay ([src]). For conventional HTTP-based
+live streaming, segment durations range from around 2 to 10 seconds,
+depending on the configuration ([src]). RTMP runs over TCP, so packet loss
+could increase latency through head-of-line blocking; SRT runs over UDP and
+attempts to recover lost packets within a configured latency window
+([src]). The design can use RTMP/SRT from the venue to processing, then HLS
+to reach viewers; if ultra-low-latency playback becomes a requirement,
+WebRTC or specialized low-latency delivery protocols should be evaluated,
+since SRT is not a direct replacement for HLS across millions of consumer
+devices ([src]). Cached CDN content could become stale; live segments are
+typically immutable once published, so they suit caching, while frequently
+updated manifests require shorter cache durations ([src]). When bandwidth
 increases, the player switches to a higher-bitrate rendition; when it
-decreases, a lower one; when conditions stabilize, it stays ([src]).
-Switches typically happen at segment boundaries ([src]).
-
-Use this pipeline for live events with mixed devices and sharp concurrent
-viewer spikes, and when 4 to 30 seconds of latency is the target ([src]).
-Use RTMP or SRT to move video from the venue to processing, then HLS to
-reach consumer players and CDNs ([src]). If ultra-low-latency playback
-becomes a requirement, evaluate WebRTC or specialized low-latency protocols;
-SRT is not a direct replacement for HLS across millions of consumer devices
+decreases, a lower one; when conditions stabilize, it continues at a
+suitable quality level. Switches typically happen at segment boundaries
 ([src]).
 
-Sources: [System Design Interview: Design Live Streaming System][src]
-(#200, 6 Nov 2026).
+Sources: Neo Kim and Mandeep Singh Shekhawat,
+[System Design Interview: Design Live Streaming System][src]
+(System Design Newsletter #200, 6 Nov 2026).
 
 [src]: https://newsletter.systemdesign.one/p/live-streaming-system-design
-
-## One-page note
-
-What. Day 46 learning note: ingest, transcode/ABR ladder, HLS packaging,
-CDN, and player. Toy ABR picker from bandwidth samples.
-
-Why. 50 million viewers at 5 Mbps is 250 Tbps; a central origin cannot
-efficiently serve that ([src]).
-
-Tradeoffs. Shorter HLS segments could cut latency but raise request load
-([src]). RTMP/TCP could add HOL delay; SRT/UDP retransmits inside a latency
-window ([src]). CDN cache could go stale; published segments are typically
-immutable, so manifests use shorter cache ([src]).
-
-When. Live events with mixed devices and sharp spikes, at 4 to 30 seconds
-of latency ([src]). RTMP/SRT for contribution; HLS for playback. Evaluate
-WebRTC if ultra-low latency is required ([src]).
-
-Cites. https://newsletter.systemdesign.one/p/live-streaming-system-design
