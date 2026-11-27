@@ -24,9 +24,9 @@ repeats it for many users whose requests compete for the same hardware
 ([src]).
 
 ```
-text -> tokenize -> prefill (parallel; KV cache; first token / TTFT)
+text -> tokenize -> prefill (parallel; KV cache; first token; part of TTFT)
      -> decode (autoregressive; reuse KV; append newest token)
-     -> stream (SSE or WebSocket; optional chunk buffering)
+     -> stream (e.g. SSE, WebSocket; optional chunk buffering)
 
 tokenize     e.g. BPE, SentencePiece; exact split depends on the tokenizer
 context      max tokens at once; prompt, history, tools; output limits vary
