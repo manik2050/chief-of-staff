@@ -28,9 +28,9 @@ text -> tokenize -> prefill (parallel; KV cache; first token / TTFT)
      -> decode (autoregressive; reuse KV; append newest token)
      -> stream (SSE or WebSocket; optional chunk buffering)
 
-tokenize     BPE or SentencePiece; exact split depends on the tokenizer
-context      max tokens at once; prompt plus history, tools, output limits
-prefill      stacked layers; causal attention; keys and values into KV cache
+tokenize     e.g. BPE, SentencePiece; exact split depends on the tokenizer
+context      max tokens at once; prompt, history, tools; output limits vary
+prefill      stacked layers; normally causal attention; keys, values to KV cache
 decode       sequential; compute KV only for the newest token; logits; stop
 stream       does not make decode faster; changes when tokens reach the user
 many users   requests compete for the same hardware
